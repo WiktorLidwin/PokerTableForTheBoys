@@ -48,16 +48,26 @@ Game.prototype = {
             console.log("HJERE")
             canvas.style.display = "block"
             positions = sentPositions;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < card_positions.length * 2; i++) {
                 var btn = document.createElement("button");
                 btn.innerHTML = "Sit Down";
                 btn.style.position = "absolute";
-                btn.style.left = card_positions[(i - 1) * 2] + 'px';
-                btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
+                if (i > 2 && i < 6) {
+                    console.log(card_positions[(i - 1) * 2 + 1] + cardy_size)
+                    btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
+                    btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
+                } else {
+                    btn.style.left = card_positions[(i - 1) * 2] + 'px';
+                    btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
+                }
                 var body = document.getElementsByTagName("body")[0];
                 body.appendChild(btn);
                 btn.addEventListener("click", function() {
-                    //pop up or some shit?
+                    console.log("clicked on btn:" + i)
+                    var x = document.createElement("INPUT");
+                    x.setAttribute("type", "text");
+                    x.setAttribute("value", "NickName:");
+                    document.body.appendChild(x);
                 })
             }
             var btn = document.createElement("button");
@@ -67,6 +77,9 @@ Game.prototype = {
             btn.style.top = canvas.height / 4 * 3 + 'px';
             var body = document.getElementsByTagName("body")[0];
             body.appendChild(btn);
+            btn.addEventListener("click", function() {
+                console.log("clicked on btn:" + -1)
+            })
         })
 
         //this.socket.emit('login', "Thictor", 1000, position)
