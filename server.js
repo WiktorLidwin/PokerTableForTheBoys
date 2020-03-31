@@ -13,6 +13,7 @@ server.listen(3001); //local
 //server.listen(process.env.PORT); //publish to heroku
 console.log('server started on port ' /*+process.env.PORT ||*/ + 3001);
 io.sockets.on('connection', function(socket) {
+
     socket.emit("send_positions", positions);
     socket.on('login', function(nickname, chips, position) {
         users.push(socket.id)
@@ -24,7 +25,7 @@ io.sockets.on('connection', function(socket) {
         players[players.length - 1].position = position;
         positions[position] = socket.id;
         console.log("Hello")
-
+        socket.emit('player_profile', chips)
     })
     socket.on('start_game', function() {
         GAMESTATE = 1;
@@ -55,7 +56,7 @@ io.sockets.on('connection', function(socket) {
 
         }
 
-    })
+    });
     socket.on('disconnect', function() {
         for (let i = 0; i < players.length; i++) {
             if (socket.id === players[i].socketid) {

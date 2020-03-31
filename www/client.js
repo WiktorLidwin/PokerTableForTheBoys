@@ -10,6 +10,10 @@ let cardy_size = cardx_size * 3 / 2;
 var positions = [];
 var folded_card = new Image(cardx_size, cardy_size);
 var leader = false;
+var clicked_sit_down_btn = false;
+var current_sit_down_btn_clicked = null;
+var current_request_btn_clicked = null;
+var nickname = "";
 folded_card.src = "Cards/" + "gray_back" + ".png";
 var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
@@ -32,6 +36,18 @@ function noScroll() {
 // add listener to disable scroll
 window.addEventListener('scroll', noScroll);
 
+function delete_sit_down_btns() {
+    var body = document.getElementsByTagName("body")[0];
+    temp = body.childNodes;
+    console.log(temp.length);
+    for (let i = 0; i < temp.length; i++) {
+        if (temp[i].className == "name-text-box" || temp[i].className == "request-btn" || temp[i].className == "sit-down-btn") {
+            body.removeChild(temp[i])
+            i--;
+        }
+
+    }
+}
 
 Game.prototype = {
     server: 0,
@@ -44,47 +60,144 @@ Game.prototype = {
             // document.getElementById('nickWrapper').style.display = 'block';
             // document.getElementById('nicknameInput').focus();
         });
-        this.socket.on('send_positions', function(sentPositions) {
+        this.socket.on('send_positions', function(sentPositions, nicknames) {
+            console.log(sentPositions)
             console.log("HJERE")
             canvas.style.display = "block"
             positions = sentPositions;
-            for (let i = 0; i < card_positions.length * 2; i++) {
-                var btn = document.createElement("button");
-                btn.innerHTML = "Sit Down";
-                btn.style.position = "absolute";
-                if (i > 2 && i < 6) {
-                    console.log(card_positions[(i - 1) * 2 + 1] + cardy_size)
-                    btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
-                    btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
-                } else {
-                    btn.style.left = card_positions[(i - 1) * 2] + 'px';
-                    btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
+            for (let i = 0; i < 10; i++) {
+                if (positions[i] === 0) {
+                    var btn = document.createElement("button");
+                    btn.className = "sit-down-btn"
+                    btn.innerHTML = "Sit Down";
+                    btn.style.position = "absolute";
+                    if (i > 2 && i < 6) {
+                        console.log(card_positions[(i - 1) * 2 + 1] + cardy_size)
+                        btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
+                        btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
+                    } else {
+                        btn.style.left = card_positions[(i - 1) * 2] + 'px';
+                        btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
+                    }
+                    var body = document.getElementsByTagName("body")[0];
+                    body.appendChild(btn);
+                    btn.addEventListener("click", function() {
+                        console.log("clicked on btn:" + i)
+                        if (current_sit_down_btn_clicked !== null) {
+                            current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
+                            current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);
+                        }
+                        var x = document.createElement("input");
+                        current_sit_down_btn_clicked = x;
+                        x.setAttribute("type", "text");
+                        x.setAttribute("placeHolder", "NickName: ");
+                        x.className = "name-text-box"
+                        x.style.position = 'absolute';
+                        if (i > 2 && i < 6) {
+                            x.style.left = (card_positions[(i - 1) * 2] - 10) + 'px';
+                            x.style.top = (card_positions[(i - 1) * 2 + 1] + 48 + cardy_size) + 'px';
+                        } else {
+                            x.style.left = card_positions[(i - 1) * 2] - 10 + 'px';
+                            x.style.top = card_positions[(i - 1) * 2 + 1] + 48 + 'px';
+                        }
+                        var body = document.getElementsByTagName("body")[0];
+                        body.appendChild(x);
+                        var btn = document.createElement("button");
+                        btn.className = "request-btn"
+                        btn.innerHTML = "Request Spot";
+                        btn.style.position = "absolute";
+                        if (i > 2 && i < 6) {
+                            btn.style.left = (card_positions[(i - 1) * 2] - 10) + 'px';
+                            btn.style.top = (card_positions[(i - 1) * 2 + 1] + 70 + cardy_size) + 'px';
+                        } else {
+                            btn.style.left = card_positions[(i - 1) * 2] - 10 + 'px';
+                            btn.style.top = card_positions[(i - 1) * 2 + 1] + 70 + 'px';
+                        }
+                        var body = document.getElementsByTagName("body")[0];
+                        body.appendChild(btn);
+                        current_request_btn_clicked = btn
+                        btn.addEventListener("click", function() {
+                            nickname = x.value;
+                            position = i;
+                            console.log(nickname);
+                            console.log(position);
+                            delete_sit_down_btns()
+                            var user_profile_box = document.createElement("textBox")
+                            user_profile_box.id = "user_profile_box"
+                            user_profile_box.className = "user_profile_box"
+                            user_profile_box.style.position = "absolute";
+                            user_profile_box.style.left = canvas.width / 2 + 'px';
+                            user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
+                            var body = document.getElementsByTagName("body")[0];
+                            body.appendChild(user_profile_box);
+                            that.socket.emit('login', nickname, 1000, position)
+                        })
+                    })
                 }
-                var body = document.getElementsByTagName("body")[0];
-                body.appendChild(btn);
-                btn.addEventListener("click", function() {
-                    console.log("clicked on btn:" + i)
-                    var x = document.createElement("INPUT");
-                    x.setAttribute("type", "text");
-                    x.setAttribute("value", "NickName:");
-                    document.body.appendChild(x);
-                })
-            }
-            var btn = document.createElement("button");
-            btn.innerHTML = "Sit Down";
-            btn.style.position = "absolute";
-            btn.style.left = canvas.width / 2 + 'px';
-            btn.style.top = canvas.height / 4 * 3 + 'px';
-            var body = document.getElementsByTagName("body")[0];
-            body.appendChild(btn);
-            btn.addEventListener("click", function() {
-                console.log("clicked on btn:" + -1)
-            })
-        })
+                if (positions[0] === 0) {
+                    var btn = document.createElement("button");
+                    btn.className = "sit-down-btn"
+                    btn.innerHTML = "Sit Down";
+                    btn.style.position = "absolute";
+                    btn.style.left = canvas.width / 2 + 'px';
+                    btn.style.top = canvas.height / 4 * 3 + 'px';
+                    var body = document.getElementsByTagName("body")[0];
+                    body.appendChild(btn);
+                    btn.addEventListener("click", function() {
+                        console.log("clicked on btn:" + -1)
+                        if (current_sit_down_btn_clicked !== null) {
+                            current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
+                            current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);
+                        }
+                        var x = document.createElement("input");
+                        current_sit_down_btn_clicked = x;
+                        x.setAttribute("type", "text");
+                        x.setAttribute("placeHolder", "NickName: ");
+                        x.className = "name-text-box"
+                        x.style.position = 'absolute';
+                        x.style.left = canvas.width / 2 - 10 + 'px';
+                        x.style.top = canvas.height / 4 * 3 + 48 + 'px';
+                        var body = document.getElementsByTagName("body")[0];
+                        body.appendChild(x);
+                        var btn = document.createElement("button");
+                        btn.className = "request-btn"
+                        btn.innerHTML = "Request Spot";
+                        btn.style.position = "absolute";
+                        btn.style.left = canvas.width / 2 - 10 + 'px';
+                        btn.style.top = canvas.height / 4 * 3 + 70 + 'px';
+                        var body = document.getElementsByTagName("body")[0];
+                        body.appendChild(btn);
+                        current_request_btn_clicked = btn;
+                        btn.addEventListener("click", function() {
+                            nickname = x.value;
+                            position = 0;
+                            console.log(nickname);
+                            console.log(position);
+                            delete_sit_down_btns();
 
-        //this.socket.emit('login', "Thictor", 1000, position)
-        //this.socket.emit('start_game');
-        //this.socket.emit('request_cards')
+                            var user_profile_box = document.createElement("textBox")
+                            user_profile_box.id = "user_profile_box"
+                            user_profile_box.style.position = "absolute";
+                            user_profile_box.style.left = canvas.width / 2 + 'px';
+                            user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
+                            var body = document.getElementsByTagName("body")[0];
+                            body.appendChild(user_profile_box);
+                            that.socket.emit('login', nickname, 1000, position)
+                        })
+                    })
+
+                }
+            }
+        });
+        this.socket.on('player_profile', function(chips) {
+                console.log("rofile update")
+                var user_profile_box = document.getElementById("user_profile_box");
+                user_profile_box.innerHTML = nickname + "\n" + chips;
+
+            })
+            //this.socket.emit('login', "Thictor", 1000, position)
+            //this.socket.emit('start_game');
+            //this.socket.emit('request_cards')
         this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards grey
             console.log("Cards/" + cards[0].rank + cards[0].suit + ".png");
             console.log("Cards/" + cards[1].rank + cards[1].suit + ".png");
