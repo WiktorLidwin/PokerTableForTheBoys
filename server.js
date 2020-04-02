@@ -3,9 +3,10 @@ var express = require('express'),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     users = [];
-nicknames = [];
+nicknames = [null, null, null, null, null, null, null, null];
 players = [];
 positions = [0, 0, 0, 0, 0, 0, 0, 0]
+players_chips = [0, 0, 0, 0, 0, 0, 0, 0]
 GAMESTATE = 0;
 var currect_deck = [];
 app.use('/', express.static(__dirname + '/www'));
@@ -13,8 +14,8 @@ server.listen(3001); //local
 //server.listen(process.env.PORT); //publish to heroku
 console.log('server started on port ' /*+process.env.PORT ||*/ + 3001);
 io.sockets.on('connection', function(socket) {
-
     socket.emit("send_positions", positions);
+    socket.emit('update_other_profiles', nicknames, positions, players_chips);
     socket.on('login', function(nickname, chips, position) {
         users.push(socket.id)
         players[players.length] = new PLAYER();
@@ -24,17 +25,38 @@ io.sockets.on('connection', function(socket) {
         players[players.length - 1].chips = chips;
         players[players.length - 1].position = position;
         positions[position] = socket.id;
-        console.log("Hello")
+        nicknames[position] = nickname;
+        players_chips[position] = chips;
+        console.log(chips)
+        socket.leader = false;
         socket.emit('player_profile', chips)
-    })
+        io.emit('update_other_profiles', nicknames, positions, players_chips);
+        socket.broadcast.emit("send_positions", positions);
+        if (users.length === 1) {
+            socket.emit('set_leader', GAMESTATE);
+            socket.leader = true;
+        }
+    });
     socket.on('start_game', function() {
         GAMESTATE = 1;
-        refill_deck();
-        shuffle(deck);
-        give_cards()
-        pick_flop();
-        currect_deck = flop;
+        make_preflop();
     });
+    socket.on('flop', function() {
+        make_flop();
+    })
+    socket.on('turn', function() {
+        make_turn();
+    })
+    socket.on('river', function() {
+        make_river();
+    })
+    socket.on('next_round', function() {
+        flop = [];
+        turn = null;
+        river = null;
+        currect_deck = [];
+        make_preflop();
+    })
     socket.on('request_cards', function() {
         folded = [];
         stillPlaying = [];
@@ -53,21 +75,81 @@ io.sockets.on('connection', function(socket) {
                 console.log(currect_deck)
                 socket.emit('send_cards', players[i].cards, folded, stillPlaying, currect_deck)
             }
-
         }
-
     });
     socket.on('disconnect', function() {
+        console.log("dc")
+        console.log(users)
         for (let i = 0; i < players.length; i++) {
             if (socket.id === players[i].socketid) {
+                positions[players[i].position] = 0;
+                nicknames[players[i].position] = null;
+                players_chips[players[i].position] = 0;
                 players.splice(i, 1);
             }
+        }
+        for (let i = 0; i < users.length; i++) {
+            if (socket.id === users[i]) {
+                users.splice(i, 1);
+            }
+        }
+        if (socket.leader && users.length !== 0) {
+            users[0].leader = true;
+            console.log(users)
+            console.log("new leader"); //test this
 
+            io.to(users[0]).emit('set_leader', GAMESTATE);
+        }
+        if (users.length === 0) {
+            GAMESTATE = 0;
         }
     })
 
 })
 
+function make_preflop() {
+    refill_deck();
+    shuffle(deck);
+    give_cards()
+    send_cards()
+}
+
+function send_cards() {
+    folded = [];
+    stillPlaying = [];
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].folded)
+            folded.push(players[i].position)
+        else
+            stillPlaying.push(players[i].position)
+
+    }
+    for (let i = 0; i < players.length; i++) {
+        console.log("sent cards to: " + i)
+        console.log(currect_deck)
+        io.to(players[i].socketid).emit('send_cards', players[i].cards, folded, stillPlaying, currect_deck)
+        check_hands(currect_deck.concat(players[i].cards), i)
+        io.to(players[i].socketid).emit('hand', players[i].winning_hand)
+    }
+}
+
+function make_flop() {
+    pick_flop();
+    currect_deck = flop;
+    send_cards()
+}
+
+function make_turn() {
+    pick_turn();
+    currect_deck = currect_deck.concat(turn);
+    send_cards()
+}
+
+function make_river() {
+    pick_river();
+    currect_deck = currect_deck.concat(river);
+    send_cards()
+}
 suits = ["D", "C", "S", "H"];
 ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
 deck = [];
@@ -358,6 +440,9 @@ function staightFlush(cards) {
             return ranks.indexOf(cards[i].rank);
         }
     }
+    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3 && cards[cards.length - 1].suit == cards[cards.length - 2].suit && cards[cards.length - 1].suit == cards[cards.length - 3].suit && cards[cards.length - 1].suit == cards[cards.length - 4].suit && cards[cards.length - 1].suit == cards[cards.length - 5].suit) {
+        return 3;
+    }
     return 0;
 
 }
@@ -386,14 +471,14 @@ function quads(cards) {
 }
 
 function fullHouse(cards) {
-    if (onePair(cards) != null && onePair(cards).length == 3 && threeOfAKind(cards)) {
-        temp = [];
-        temp[0] = threeOfAKind(cards);
-        if (onePair(cards)[0] == temp[0])
-            temp[1] = onePair(cards)[1]
+    if (twoPair(cards) && threeOfAKind(cards)) {
+        temp4 = [];
+        temp4[0] = threeOfAKind(cards)[0];
+        if (twoPair(cards)[0] == temp4[0])
+            temp4[1] = twoPair(cards)[1]
         else
-            temp[1] = onePair(cards)[0]
-        return temp;
+            temp4[1] = twoPair(cards)[0]
+        return temp4;
     }
     return 0;
 }
@@ -417,6 +502,9 @@ function straight(cards) {
             return ranks.indexOf(cards[i].rank);
         }
     }
+    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3) {
+        return 3;
+    }
     return 0;
 }
 
@@ -436,7 +524,8 @@ function threeOfAKind(cards) {
             }
             temp2 = [];
             temp2.push(cards[i].rank);
-            return temp2.concat(temp);
+            temp2 = temp2.concat(temp)
+            return temp2;
         }
     }
     return 0;

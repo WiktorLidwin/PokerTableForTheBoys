@@ -164,10 +164,10 @@ function run_game() {
         // }
     pick_river();
     console.log("river:")
-    console.log(currect_deck)
     currect_deck = currect_deck.concat(river);
+    console.log(currect_deck)
     for (let i = 0; i < players.length; i++) {
-        check_hands(players[i].cards.concat(currect_deck), i);
+        check_hands(currect_deck.concat(players[i].cards), i);
     }
     console.log(players[0].hand)
     console.log(players[1].hand)
@@ -295,6 +295,9 @@ function staightFlush(cards) {
             return ranks.indexOf(cards[i].rank);
         }
     }
+    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3 && cards[cards.length - 1].suit == cards[cards.length - 2].suit && cards[cards.length - 1].suit == cards[cards.length - 3].suit && cards[cards.length - 1].suit == cards[cards.length - 4].suit && cards[cards.length - 1].suit == cards[cards.length - 5].suit) {
+        return 3;
+    }
     return 0;
 
 }
@@ -323,14 +326,14 @@ function quads(cards) {
 }
 
 function fullHouse(cards) {
-    if (onePair(cards) != null && onePair(cards).length == 3 && threeOfAKind(cards)) {
-        temp = [];
-        temp[0] = threeOfAKind(cards);
-        if (onePair(cards)[0] == temp[0])
-            temp[1] = onePair(cards)[1]
+    if (twoPair(cards) && threeOfAKind(cards)) {
+        temp4 = [];
+        temp4[0] = threeOfAKind(cards)[0];
+        if (twoPair(cards)[0] == temp4[0])
+            temp4[1] = twoPair(cards)[1]
         else
-            temp[1] = onePair(cards)[0]
-        return temp;
+            temp4[1] = twoPair(cards)[0]
+        return temp4;
     }
     return 0;
 }
@@ -354,6 +357,9 @@ function straight(cards) {
             return ranks.indexOf(cards[i].rank);
         }
     }
+    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3) {
+        return 3;
+    }
     return 0;
 }
 
@@ -373,7 +379,8 @@ function threeOfAKind(cards) {
             }
             temp2 = [];
             temp2.push(cards[i].rank);
-            return temp2.concat(temp);
+            temp2 = temp2.concat(temp)
+            return temp2;
         }
     }
     return 0;

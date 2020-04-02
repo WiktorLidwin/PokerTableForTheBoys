@@ -113,6 +113,26 @@
     
     .user_profile_box {
         border-radius: 25px;
+        border: 2px solid rgb(255, 0, 0);
+        padding: 20px;
+        width: 75px;
+        height: 40px;
+        text-align: center;
+        font-size: 30px;
+    }
+    
+    .start-game-btn {
+        border-radius: 25px;
+        border: 2px solid rgb(0, 255, 0);
+        padding: 20px;
+        width: 200px;
+        height: 100px;
+        text-align: center;
+        font-size: 30px;
+    }
+    
+    .other_user_profile {
+        border-radius: 25px;
         border: 2px solid rgb(0, 0, 0);
         padding: 20px;
         width: 75px;
