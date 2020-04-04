@@ -5,7 +5,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 var ctx = canvas.getContext("2d");
 let position = -1;
-let cardx_size = canvas.width / 15;
+let cardx_size = canvas.width / 20;
 let cardy_size = cardx_size * 3 / 2;
 var positions = [];
 var folded_card = new Image(cardx_size, cardy_size);
@@ -64,6 +64,35 @@ function create_player_profile(nickname, pos, chips) {
     other_user_profile.innerHTML = nickname + "\n" + chips;
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(other_user_profile);
+}
+
+function create_game_btns() {
+    btn = document.createElement("button");
+    btn.className = "raise-btn"
+    btn.innerHTML = "Raise";
+    btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 - 150 + cardx_size + 'px';
+    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(btn);
+
+    btn = document.createElement("button");
+    btn.className = "check-btn"
+    btn.innerHTML = "Check";
+    btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 + cardx_size + 'px';
+    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(btn);
+
+    btn = document.createElement("button");
+    btn.className = "fold-btn"
+    btn.innerHTML = "Fold";
+    btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 + 150 + cardx_size + 'px';
+    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(btn);
 }
 
 Game.prototype = {
@@ -172,6 +201,7 @@ Game.prototype = {
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
                                 var body = document.getElementsByTagName("body")[0];
                                 body.appendChild(user_profile_box);
+                                create_game_btns();
                                 that.socket.emit('login', nickname, 1000, position)
                             })
                         })
@@ -225,6 +255,7 @@ Game.prototype = {
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
                                 var body = document.getElementsByTagName("body")[0];
                                 body.appendChild(user_profile_box);
+                                create_game_btns();
                                 that.socket.emit('login', nickname, 1000, position)
                             })
                         })

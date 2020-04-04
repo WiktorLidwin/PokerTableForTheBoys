@@ -8,6 +8,7 @@ players = [];
 positions = [0, 0, 0, 0, 0, 0, 0, 0]
 players_chips = [0, 0, 0, 0, 0, 0, 0, 0]
 GAMESTATE = 0;
+pot = 0;
 var currect_deck = [];
 app.use('/', express.static(__dirname + '/www'));
 server.listen(3001); //local
@@ -114,6 +115,7 @@ function make_preflop() {
 }
 
 function send_cards() {
+    console.log(1)
     folded = [];
     stillPlaying = [];
     for (let i = 0; i < players.length; i++) {
@@ -123,35 +125,27 @@ function send_cards() {
             stillPlaying.push(players[i].position)
 
     }
-    for (let i = 0; i < players.length; i++) {
-        console.log("sent cards to: " + i)
-        console.log(currect_deck)
-        io.to(players[i].socketid).emit('send_cards', players[i].cards, folded, stillPlaying, currect_deck)
-        check_hands(currect_deck.concat(players[i].cards), i)
-        io.to(players[i].socketid).emit('player_profile', players[i].chips, players[i].winning_hand)
-    }
-    temp = [];
-    for (let i = 0; i < players.length; i++) {
-        temp.push(players[i].socketid);
-    }
-
+    // for (let i = 0; i < players.length; i++) {
+    //     console.log("sent cards to: " + i)
+    //     console.log(currect_deck)
+    //     io.to(players[i].socketid).emit('send_cards', players[i].cards, folded, stillPlaying, currect_deck)
+    //     check_hands(currect_deck.concat(players[i].cards), i)
+    //     io.to(players[i].socketid).emit('player_profile', players[i].chips, players[i].winning_hand)
+    // }
     for (let i = 0; i < users.length; i++) {
-        console.log("sent cards to: " + i)
-        console.log(currect_deck)
-        if (temp.indexOf(users[i]) != -1) {
-            z = temp.indexOf(users[i])
-            io.to(players[z].socketid).emit('send_cards', players[z].cards, folded, stillPlaying, currect_deck)
-            check_hands(currect_deck.concat(players[z].cards), z)
-            io.to(players[z].socketid).emit('player_profile', players[z].chips, players[z].winning_hand)
-        } else {
-            console.log("spectator")
-                //console.log(users)
-                //console.log(user[i])
+        temp = false;
+        for (let z = 0; z < players.length; z++) {
+            if (users[i] === players[z].socketid) {
+                temp = true;
+                io.to(players[z].socketid).emit('send_cards', players[z].cards, folded, stillPlaying, currect_deck)
+                check_hands(currect_deck.concat(players[z].cards), z)
+                io.to(players[z].socketid).emit('player_profile', players[z].chips, players[z].winning_hand)
+            }
+        }
+        if (!temp) {
             io.to(users[i]).emit('send_cards', null, folded, stillPlaying, currect_deck);
         }
     }
-
-
 }
 
 function make_flop() {
