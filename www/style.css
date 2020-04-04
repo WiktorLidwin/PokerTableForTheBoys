@@ -171,6 +171,16 @@
         font-size: 30px;
     }
     
+    .my_turn {
+        border-radius: 25px;
+        border: 2px solid rgb(0, 0, 0);
+        padding: 20px;
+        width: 300px;
+        height: 75px;
+        text-align: center;
+        font-size: 50px;
+    }
+    
     .name-text-box {
         padding: 0;
         height: 30px;

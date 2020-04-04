@@ -1,3 +1,5 @@
+const e = require('express');
+
 var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
@@ -9,6 +11,10 @@ positions = [0, 0, 0, 0, 0, 0, 0, 0]
 players_chips = [0, 0, 0, 0, 0, 0, 0, 0]
 GAMESTATE = 0;
 pot = 0;
+boardState = 0; //0 = preflop 1 = flop ...
+folded = [];
+stillPlaying = [];
+current_pos = 0;
 var currect_deck = [];
 app.use('/', express.static(__dirname + '/www'));
 server.listen(3001); //local
@@ -39,26 +45,41 @@ io.sockets.on('connection', function(socket) {
             socket.leader = true;
         }
     });
+
+    socket.on("check", function() {
+        current_pos++
+        round(socket)
+    })
+    socket.on("fold", function() {
+        current_pos++
+        round()
+    })
+    socket.on("raise", function(amount) {
+        current_pos++
+        round()
+    })
+
     socket.on('start_game', function() {
         GAMESTATE = 1;
         make_preflop();
+        round()
     });
     socket.on('flop', function() {
         make_flop();
-    })
+    });
     socket.on('turn', function() {
         make_turn();
-    })
+    });
     socket.on('river', function() {
         make_river();
-    })
+    });
     socket.on('next_round', function() {
         flop = [];
         turn = null;
         river = null;
         currect_deck = [];
         make_preflop();
-    })
+    });
     socket.on('request_cards', function() {
         folded = [];
         stillPlaying = [];
@@ -106,6 +127,51 @@ io.sockets.on('connection', function(socket) {
     })
 
 })
+
+function round() {
+    folded = [];
+    stillPlaying = [];
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].folded)
+            folded.push(players[i].position)
+        else
+            stillPlaying.push(players[i].position)
+
+    }
+    stillPlaying.sort((a, b) => a - b);
+    console.log("*****")
+    console.log(stillPlaying)
+    console.log(folded)
+
+    if (stillPlaying.length != current_pos)
+        for (let z = 0; z < players.length; z++) {
+            if (stillPlaying[current_pos] === players[z].position) {
+                io.to(players[z].socketid).emit("my_turn")
+            }
+        }
+    else {
+        console.log("round over")
+        current_pos = 0;
+        if (boardState == 0) {
+            make_flop();
+        }
+        if (boardState == 1) {
+            make_turn();
+        }
+        if (boardState == 2) {
+            make_river();
+        }
+        if (boardState == 3) {
+            flop = [];
+            turn = null;
+            river = null;
+            currect_deck = [];
+            make_preflop();
+        }
+        boardState = (boardState + 1) % 4;
+        round();
+    }
+}
 
 function make_preflop() {
     refill_deck();

@@ -65,8 +65,18 @@ function create_player_profile(nickname, pos, chips) {
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(other_user_profile);
 }
+my_turn = false;
 
 function create_game_btns() {
+    var btn = document.createElement("textBox")
+    btn.id = "my_turn"
+    btn.className = "my_turn"
+    btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 + 'px';
+    btn.style.top = canvas.height / 4 - cardy_size + 'px';
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(btn);
+
     btn = document.createElement("button");
     btn.className = "raise-btn"
     btn.innerHTML = "Raise";
@@ -75,6 +85,15 @@ function create_game_btns() {
     btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
+    btn.addEventListener("click", function() {
+        if (my_turn) {
+            amount = 50; //change this later
+            that.socket.emit("raise", amount);
+            my_turn = false;
+            var btn = document.getElementById("my_turn");
+            btn.innerHTML = "";
+        }
+    })
 
     btn = document.createElement("button");
     btn.className = "check-btn"
@@ -84,6 +103,14 @@ function create_game_btns() {
     btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
+    btn.addEventListener("click", function() {
+        if (my_turn) {
+            that.socket.emit("check")
+            my_turn = false;
+            var btn = document.getElementById("my_turn");
+            btn.innerHTML = "";
+        }
+    })
 
     btn = document.createElement("button");
     btn.className = "fold-btn"
@@ -93,12 +120,20 @@ function create_game_btns() {
     btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
+    btn.addEventListener("click", function() {
+        if (my_turn) {
+            that.socket.emit("fold")
+            my_turn = false;
+            var btn = document.getElementById("my_turn");
+            btn.innerHTML = "";
+        }
+    })
 }
-
+var that = null;
 Game.prototype = {
     server: 0,
     init: function() {
-        var that = this;
+        that = this;
         this.socket = io.connect();
         this.socket.on('connect', function() {
             console.log("connected");
@@ -106,6 +141,13 @@ Game.prototype = {
             // document.getElementById('nickWrapper').style.display = 'block';
             // document.getElementById('nicknameInput').focus();
         });
+        this.socket.on("my_turn", function() {
+            var btn = document.getElementById("my_turn");
+            btn.innerHTML = "UR TURN!";
+            console.log("UR TURN") //ur turn text box make
+            my_turn = true;
+            timer = null; //add timer here
+        })
         this.socket.on('set_leader', function(GAMESTATE) {
             leader = true;
             if (GAMESTATE === 0) {
@@ -202,6 +244,7 @@ Game.prototype = {
                                 var body = document.getElementsByTagName("body")[0];
                                 body.appendChild(user_profile_box);
                                 create_game_btns();
+
                                 that.socket.emit('login', nickname, 1000, position)
                             })
                         })
@@ -294,7 +337,10 @@ Game.prototype = {
             //this.socket.emit('login', "Thictor", 1000, position)
             //this.socket.emit('start_game');
             //this.socket.emit('request_cards')
-        this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards gre
+        this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards green
+            if (board.length == 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+            }
             console.log("DVGJSADJHSDVJDVB")
             console.log(cards, foldedPlayers, playingPlayers, board, fold)
             if (cards !== null) {
@@ -358,50 +404,6 @@ Game.prototype = {
                     draw_image(i, board);
                     i--;
                 }
-            }
-
-            //ctx.fillRect(0, 0, 100, 299)
-            //ctx.drawImage("Cards/" + cards[1].rank + cards[1].suit + ".png", canvas.width / 2 + 100, canvas.height / 4 * 3, 200, 300);
-
-            // show_image("Cards/" + cards[0].rank + cards[0].suit + ".png", 200, 300, 0)
-            // show_image("Cards/" + cards[1].rank + cards[0].suit + ".png", 200, 300, 0)
-
-            console.log(cards);
-            btn = document.getElementById("temp");
-            if (btn !== undefined && btn !== null)
-                btn.parentNode.removeChild(btn);
-            btn = document.createElement("button");
-            btn.className = "sit-down-btn"
-            btn.innerHTML = "Next_cards";
-            btn.id = "temp";
-            btn.style.position = "absolute";
-            btn.style.left = canvas.width / 2 + 'px';
-            btn.style.top = canvas.height / 2 - cardy_size + 'px';
-            var body = document.getElementsByTagName("body")[0];
-            body.appendChild(btn);
-
-            if (board.length === null || board.length === 0) {
-                btn.addEventListener("click", function() {
-                    that.socket.emit('flop')
-                })
-            } else if (board.length === 3) {
-                btn.addEventListener("click", function() {
-                    that.socket.emit('turn')
-                })
-            } else if (board.length === 4) {
-                btn.addEventListener("click", function() {
-                    that.socket.emit('river')
-                })
-            } else if (board.length === 5) {
-                btn.addEventListener("click", function() {
-                    // var elements = document.getElementsByClassName("board");
-                    // for (let i = 0; i < elements.length; i++) {
-                    //     elements[i].parentNode.removeChild(elements[i]);
-                    //     i--;
-                    // }
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-                    that.socket.emit('next_round')
-                })
             }
         })
 
