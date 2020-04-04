@@ -14,10 +14,11 @@ server.listen(3001); //local
 //server.listen(process.env.PORT); //publish to heroku
 console.log('server started on port ' /*+process.env.PORT ||*/ + 3001);
 io.sockets.on('connection', function(socket) {
+    users.push(socket.id);
     socket.emit("send_positions", positions);
     socket.emit('update_other_profiles', nicknames, positions, players_chips);
     socket.on('login', function(nickname, chips, position) {
-        users.push(socket.id)
+        //users.push(socket.id)
         players[players.length] = new PLAYER();
         players[players.length - 1].hand = [null, null, null, null, null, null, null, null, null, null];
         players[players.length - 1].name = nickname;
@@ -32,7 +33,7 @@ io.sockets.on('connection', function(socket) {
         socket.emit('player_profile', chips)
         io.emit('update_other_profiles', nicknames, positions, players_chips);
         socket.broadcast.emit("send_positions", positions);
-        if (users.length === 1) {
+        if (players.length === 1) {
             socket.emit('set_leader', GAMESTATE);
             socket.leader = true;
         }
@@ -93,12 +94,10 @@ io.sockets.on('connection', function(socket) {
                 users.splice(i, 1);
             }
         }
-        if (socket.leader && users.length !== 0) {
-            users[0].leader = true;
-            console.log(users)
+        if (socket.leader && players.length !== 0) {
+            players[0].leader = true;
             console.log("new leader"); //test this
-
-            io.to(users[0]).emit('set_leader', GAMESTATE);
+            io.to(players[0].socketid).emit('set_leader', GAMESTATE);
         }
         if (users.length === 0) {
             GAMESTATE = 0;
@@ -129,8 +128,30 @@ function send_cards() {
         console.log(currect_deck)
         io.to(players[i].socketid).emit('send_cards', players[i].cards, folded, stillPlaying, currect_deck)
         check_hands(currect_deck.concat(players[i].cards), i)
-        io.to(players[i].socketid).emit('hand', players[i].winning_hand)
+        io.to(players[i].socketid).emit('player_profile', players[i].chips, players[i].winning_hand)
     }
+    temp = [];
+    for (let i = 0; i < players.length; i++) {
+        temp.push(players[i].socketid);
+    }
+
+    for (let i = 0; i < users.length; i++) {
+        console.log("sent cards to: " + i)
+        console.log(currect_deck)
+        if (temp.indexOf(users[i]) != -1) {
+            z = temp.indexOf(users[i])
+            io.to(players[z].socketid).emit('send_cards', players[z].cards, folded, stillPlaying, currect_deck)
+            check_hands(currect_deck.concat(players[z].cards), z)
+            io.to(players[z].socketid).emit('player_profile', players[z].chips, players[z].winning_hand)
+        } else {
+            console.log("spectator")
+                //console.log(users)
+                //console.log(user[i])
+            io.to(users[i]).emit('send_cards', null, folded, stillPlaying, currect_deck);
+        }
+    }
+
+
 }
 
 function make_flop() {
@@ -173,6 +194,7 @@ hands = [
 
 var PLAYER = function() {};
 PLAYER.prototype = {
+    leader: false,
     position: -1,
     socketid: 0,
     name: "temp",

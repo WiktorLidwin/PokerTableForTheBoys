@@ -233,64 +233,92 @@ Game.prototype = {
                 }
             }
         });
-        this.socket.on('player_profile', function(chips) {
+        this.socket.on('player_profile', function(chips, cards) {
             console.log("rofile update")
             var user_profile_box = document.getElementById("user_profile_box");
-            user_profile_box.innerHTML = nickname + "\n" + chips;
+            user_profile_box.innerHTML = nickname + ": " + chips + "\n" + cards;
 
         });
         this.socket.on('update_other_profiles', function(nicknames, positions, chips) {
-            console.log("update_other_profiles")
-            var elements = document.getElementsByClassName("other_user_profile");
-            for (let i = 0; i < elements.length; i++) {
-                elements[i].parentNode.removeChild(elements[i]);
-                i--;
-            }
-            console.log(nicknames, positions, chips)
-            for (let i = 0; i < nicknames.length; i++) {
-                if (nicknames[i] !== null && i != position) {
-                    if (position === -1)
-                        create_player_profile(nicknames[i], (i) % 8, chips[i])
-                    else
-                        create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
+                console.log("update_other_profiles")
+                var elements = document.getElementsByClassName("other_user_profile");
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].parentNode.removeChild(elements[i]);
+                    i--;
                 }
-            }
+                console.log(nicknames, positions, chips)
+                for (let i = 0; i < nicknames.length; i++) {
+                    if (nicknames[i] !== null && i != position) {
+                        if (position === -1)
+                            create_player_profile(nicknames[i], (i) % 8, chips[i])
+                        else
+                            create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
+                    }
+                }
 
-        })
-        this.socket.on('hand', function(hand) {
-            console.log(hand)
-        });
-        //this.socket.emit('login', "Thictor", 1000, position)
-        //this.socket.emit('start_game');
-        //this.socket.emit('request_cards')
+            })
+            // this.socket.on('hand', function(hand) {
+            //     console.log(hand)
+            // });
+            //this.socket.emit('login', "Thictor", 1000, position)
+            //this.socket.emit('start_game');
+            //this.socket.emit('request_cards')
         this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards gre
+            console.log("DVGJSADJHSDVJDVB")
             console.log(cards, foldedPlayers, playingPlayers, board, fold)
-            console.log("Cards/" + cards[0].rank + cards[0].suit + ".png");
-            console.log("Cards/" + cards[1].rank + cards[1].suit + ".png");
-            var img = new Image(cardx_size, cardy_size);
-            img.src = "Cards/" + cards[0].rank + cards[0].suit + ".png";
-            img2 = new Image(cardx_size, cardy_size);
-            img2.src = "Cards/" + cards[1].rank + cards[1].suit + ".png";
-            img.onload = function() {
-                console.log("what1")
-                ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
-            };
-            img2.onload = function() {
-                console.log("what2")
-                ctx.drawImage(img2, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
-            };
-            for (let index = 0; index < 8; index++) {
-                if (foldedPlayers.indexOf((index + position) % 8) != -1) {
-                    ctx.drawImage(folded_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
-                    ctx.drawImage(folded_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+            if (cards !== null) {
+                console.log("Cards/" + cards[0].rank + cards[0].suit + ".png");
+                console.log("Cards/" + cards[1].rank + cards[1].suit + ".png");
+                var img = new Image(cardx_size, cardy_size);
+                img.src = "Cards/" + cards[0].rank + cards[0].suit + ".png";
+                img2 = new Image(cardx_size, cardy_size);
+                img2.src = "Cards/" + cards[1].rank + cards[1].suit + ".png";
+                img.onload = function() {
+                    console.log("what1")
+                    ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                };
+                img2.onload = function() {
+                    console.log("what2")
+                    ctx.drawImage(img2, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                };
+
+
+                for (let index = 0; index < 8; index++) {
+                    if (foldedPlayers.indexOf((index + position) % 8) != -1) {
+                        ctx.drawImage(folded_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                        ctx.drawImage(folded_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    }
+                    if (playingPlayers.indexOf((index + position) % 8) != -1) {
+                        console.log("*************")
+                        console.log(index)
+                        ctx.drawImage(playing_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                        ctx.drawImage(playing_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    }
+
                 }
-                if (playingPlayers.indexOf((index + position) % 8) != -1) {
-                    console.log("*************")
-                    console.log(index)
-                    ctx.drawImage(playing_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
-                    ctx.drawImage(playing_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+            } else {
+                if (foldedPlayers.indexOf(0) != -1) {
+                    ctx.drawImage(folded_card, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                    ctx.drawImage(folded_card, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                }
+                if (playingPlayers.indexOf(0) != -1) {
+                    ctx.drawImage(playing_card, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                    ctx.drawImage(playing_card, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
                 }
 
+                for (let index = 1; index < 8; index++) {
+                    if (foldedPlayers.indexOf(index) != -1) {
+                        ctx.drawImage(folded_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                        ctx.drawImage(folded_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    }
+                    if (playingPlayers.indexOf(index) != -1) {
+                        console.log("*************")
+                        console.log(index)
+                        ctx.drawImage(playing_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                        ctx.drawImage(playing_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    }
+
+                }
             }
             console.log(board);
             if (board != undefined) {
