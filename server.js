@@ -52,6 +52,11 @@ io.sockets.on('connection', function(socket) {
     })
     socket.on("fold", function() {
         current_pos++
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].socketid == socket.id) {
+                players[i].folded = true;
+            }
+        }
         round()
     })
     socket.on("raise", function(amount) {
@@ -61,6 +66,9 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('start_game', function() {
         GAMESTATE = 1;
+        for (let i = 0; i < players.length; i++) {
+            players[i].folded = false;
+        }
         make_preflop();
         round()
     });
@@ -78,6 +86,9 @@ io.sockets.on('connection', function(socket) {
         turn = null;
         river = null;
         currect_deck = [];
+        for (let i = 0; i < players.length; i++) {
+            players[i].folded = false;
+        }
         make_preflop();
     });
     socket.on('request_cards', function() {
@@ -143,13 +154,34 @@ function round() {
     console.log(stillPlaying)
     console.log(folded)
 
-    if (stillPlaying.length != current_pos)
+    if (stillPlaying.length === 1) {
+        console.log("FOLDED")
+        winner = stillPlaying[0]; //do something with this
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].position === winner) {
+                io.emit("winner", [players[i].name]);
+                //add chips
+            }
+        }
+        flop = [];
+        turn = null;
+        river = null;
+        currect_deck = [];
+        for (let i = 0; i < players.length; i++) {
+            players[i].folded = false;
+        }
+        make_preflop();
+        current_pos = 0;
+        boardState = 0;
+        round();
+
+    } else if (stillPlaying.length != current_pos) {
         for (let z = 0; z < players.length; z++) {
             if (stillPlaying[current_pos] === players[z].position) {
                 io.to(players[z].socketid).emit("my_turn")
             }
         }
-    else {
+    } else {
         console.log("round over")
         current_pos = 0;
         if (boardState == 0) {
@@ -162,10 +194,23 @@ function round() {
             make_river();
         }
         if (boardState == 3) {
+            possible_winners = check_winner();
+            console.log("GHGJJ")
+            console.log(possible_winners);
+            winners = [];
+            for (let i = 0; i < possible_winners.length; i++) {
+                console.log(players[possible_winners[i]].name)
+                winners.push(players[possible_winners[i]].name);
+            }
+            console.log(winners);
+            io.emit("winner", winners);
             flop = [];
             turn = null;
             river = null;
             currect_deck = [];
+            for (let i = 0; i < players.length; i++) {
+                players[i].folded = false;
+            }
             make_preflop();
         }
         boardState = (boardState + 1) % 4;
@@ -451,13 +496,14 @@ function check_hands(cards, player) {
         console.log("retard")
     }
 }
+possible_winners = [];
 
 function check_winner() {
     best_hand = 10;
     for (let i = 0; i < players.length; i++) {
         for (let z = 0; z < players[i].hand.length; z++) {
             //console.log("Test: " + players[i].hand[z])
-            if (players[i].hand[z] != null && z < best_hand)
+            if (players[i].hand[z] != null && z < best_hand && players[i].folded == false)
                 best_hand = z;
         }
     }
@@ -485,7 +531,7 @@ function check_winner() {
     }
     //console.log("best_hand: " + best_hand);
     console.log("Winners: " + possible_winners);
-
+    return possible_winners;
 }
 
 function sort_cards(cards) {

@@ -141,6 +141,13 @@ Game.prototype = {
             // document.getElementById('nickWrapper').style.display = 'block';
             // document.getElementById('nicknameInput').focus();
         });
+        this.socket.on("winner", function(winners) {
+            console.log("WINNER:")
+            console.log(winners)
+            for (let i = 0; i < winners.length; i++) {
+                console.log(winners[i])
+            }
+        })
         this.socket.on("my_turn", function() {
             var btn = document.getElementById("my_turn");
             btn.innerHTML = "UR TURN!";
