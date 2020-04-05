@@ -14,6 +14,7 @@ pot = 0;
 boardState = 0; //0 = preflop 1 = flop ...
 folded = [];
 stillPlaying = [];
+raised_by = 0;
 current_pos = 0;
 var currect_deck = [];
 app.use('/', express.static(__dirname + '/www'));
@@ -48,10 +49,15 @@ io.sockets.on('connection', function(socket) {
 
     socket.on("check", function() {
         current_pos++
-        round(socket)
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].socketid == socket.id) {
+                players[i].chips = players[i].chips - raised_by + players[i].chipsInPot;
+                players[i].chipsInPot = raised_by;
+            }
+        }
+        round()
     })
     socket.on("fold", function() {
-        current_pos++
         for (let i = 0; i < players.length; i++) {
             if (players[i].socketid == socket.id) {
                 players[i].folded = true;
@@ -60,7 +66,17 @@ io.sockets.on('connection', function(socket) {
         round()
     })
     socket.on("raise", function(amount) {
-        current_pos++
+        current_pos++;
+        everyone_called = false;
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].socketid == socket.id) {
+                players[i].chipsInPot += amount + raised_by;
+                players[i].chips -= amount + raised_by;
+                raised_by += amount;
+            }
+        }
+        console.log("raised to:" + raised_by);
+        //update the profiles 
         round()
     })
 
@@ -138,6 +154,7 @@ io.sockets.on('connection', function(socket) {
     })
 
 })
+var everyone_called; //false
 
 function round() {
     folded = [];
@@ -153,13 +170,52 @@ function round() {
     console.log("*****")
     console.log(stillPlaying)
     console.log(folded)
+        // if (raised_by != 0) {
+        //     everyone_called = true;
+        //     for (let i = 0; i < stillPlaying.length; i++) {
+        //         if (!(players[i].folded === true || players[i].chipsInPot === raised_by) && everyone_called) {
+        //             console.log("here?")
+        //             everyone_called = false;
+        //             current_pos = (current_pos + 1) % stillPlaying.length
+        //             for (let z = 0; z < players.length; z++) {
+        //                 if (stillPlaying[current_pos] === players[z].position) {
+        //                     io.to(players[z].socketid).emit("my_turn")
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     if (everyone_called) {
+        //         console.log("everyone_called")
+        //         raised_by = 0;
+        //         round();
+        //     }
+        // } else
+    if (raised_by != 0) {
+        for (let z = 0; z < players.length; z++) {
+            if (stillPlaying[current_pos % stillPlaying.length] === players[z].position) {
+                if (players[z].chipsInPot != raised_by) {
+                    console.log("bruh1  " + current_pos)
+                    console.log(players[z].chipsInPot)
+                    current_pos = current_pos % stillPlaying.length;
+                } else {
+                    console.log("bruh2")
+                    current_pos = stillPlaying.length;
+                }
+            }
+        }
+
+    }
 
     if (stillPlaying.length === 1) {
         console.log("FOLDED")
+        for (let z = 0; z < players.length; z++) {
+            pot += players[z].chipsInPot;
+        }
         winner = stillPlaying[0]; //do something with this
         for (let i = 0; i < players.length; i++) {
             if (players[i].position === winner) {
                 io.emit("winner", [players[i].name]);
+                players[i].chips += pot;
                 //add chips
             }
         }
@@ -170,6 +226,11 @@ function round() {
         for (let i = 0; i < players.length; i++) {
             players[i].folded = false;
         }
+        for (let z = 0; z < players.length; z++) {
+            players[z].chipsInPot = 0;
+        }
+        pot = 0;
+        raised_by = 0;
         make_preflop();
         current_pos = 0;
         boardState = 0;
@@ -182,7 +243,17 @@ function round() {
             }
         }
     } else {
+        for (let z = 0; z < players.length; z++) {
+            pot += players[z].chipsInPot;
+        }
+        for (let z = 0; z < players.length; z++) {
+            players[z].chipsInPot = 0;
+        }
         console.log("round over")
+        console.log(current_pos);
+        console.log(stillPlaying);
+
+        raised_by = 0;
         current_pos = 0;
         if (boardState == 0) {
             make_flop();
@@ -204,6 +275,7 @@ function round() {
             }
             console.log(winners);
             io.emit("winner", winners);
+            pot = 0;
             flop = [];
             turn = null;
             river = null;
