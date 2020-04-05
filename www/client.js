@@ -18,6 +18,8 @@ folded_card.src = "Cards/" + "gray_back" + ".png";
 var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
+var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
+
 console.log(card_positions)
 window.onload = function() {
     game = new Game();
@@ -32,7 +34,33 @@ function noScroll() {
 }
 
 
-
+function make_bets(raise_arry, current_pos) {
+    count = 0;
+    for (let i = 0; i < 8; i++) {
+        if (raise_arry[i] != null && (count < current_pos || raise_arry[i] != 0)) { // && count < current_pos
+            count++;
+            var btn = document.createElement("textBox")
+            btn.className = "betting_text"
+            btn.style.position = "absolute";
+            if (raise_arry[i] != 0)
+                btn.innerHTML = raise_arry[i]
+            else
+                btn.innerHTML = "Check"
+            console.log("*&&&(*&(*")
+            console.log(((i - position + 8) % 8) * 2)
+            if (position != -1) {
+                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px'
+                btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 'px';
+            } else {
+                btn.style.left = betting_positions[i * 2] + 'px'
+                btn.style.top = betting_positions[i * 2 + 1] + 'px';
+            }
+            var body = document.getElementsByTagName("body")[0];
+            body.appendChild(btn);
+            //betting_text
+        }
+    }
+}
 // add listener to disable scroll
 window.addEventListener('scroll', noScroll);
 
@@ -66,8 +94,10 @@ function create_player_profile(nickname, pos, chips) {
     body.appendChild(other_user_profile);
 }
 my_turn = false;
+pot = 0;
 
 function create_game_btns() {
+
     var btn = document.createElement("textBox")
     btn.id = "my_turn"
     btn.className = "my_turn"
@@ -141,20 +171,93 @@ Game.prototype = {
             // document.getElementById('nickWrapper').style.display = 'block';
             // document.getElementById('nicknameInput').focus();
         });
-        this.socket.on("winner", function(winners) {
+        this.socket.on("pot_update", function(new_pot) {
+            pot = new_pot;
+            btn = document.getElementById("pot_box")
+            btn.innerHTML = "Pot: " + new_pot;
+        })
+        this.socket.on("winner", function(winners, players_hands) {
             console.log("WINNER:")
             console.log(winners)
+            console.log(players_hands)
             for (let i = 0; i < winners.length; i++) {
                 console.log(winners[i])
             }
-        })
-        this.socket.on("my_turn", function() {
-            var btn = document.getElementById("my_turn");
-            btn.innerHTML = "UR TURN!";
-            console.log("UR TURN") //ur turn text box make
-            my_turn = true;
-            timer = null; //add timer here
-        })
+
+            for (let i = 0; i < 8; i++) {
+                if (players_hands[i] != null) {
+                    console.log("i: " + i)
+                    var img = new Image(cardx_size, cardy_size);
+                    img.src = "Cards/" + players_hands[i][0].rank + players_hands[i][0].suit + ".png";
+                    img2 = new Image(cardx_size, cardy_size);
+                    img2.src = "Cards/" + players_hands[i][1].rank + players_hands[i][1].suit + ".png";
+                    // if (position != -1) {
+                    //     btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px'
+                    //     btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 'px';
+                    // } else {
+                    //     btn.style.left = betting_positions[i * 2] + 'px'
+                    //     btn.style.top = betting_positions[i * 2 + 1] + 'px';
+                    // }
+                    // if (foldedPlayers.indexOf((index + position) % 8) != -1) {
+                    //     ctx.drawImage(folded_card, card_positions[(index - 1) * 2] + cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    //     ctx.drawImage(folded_card, card_positions[(index - 1) * 2] - cardx_size / 2, card_positions[(index - 1) * 2 + 1], cardx_size, cardy_size);
+                    // }
+                    img.onload = function() {
+                        // else if (position == 0) {
+                        //     ctx.drawImage(img, card_positions[((i - position - 1)) * 2], card_positions[((i - position - 1)) * 2 + 1], cardx_size, cardy_size);
+                        // }
+                        if (position == -1) {
+                            console.log("bruh")
+                            if (i == 0) {
+                                ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                            } else
+                                ctx.drawImage(img, card_positions[(i - 1) * 2] + cardx_size / 2, card_positions[(i - 1) * 2 + 1], cardx_size, cardy_size);
+                        } else {
+                            console.log(card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1])
+                            if (i - position === 0) {
+                                console.log("bruh1")
+                                    //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                            } else
+                                ctx.drawImage(img, card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1], cardx_size, cardy_size);
+                        }
+                        //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                    };
+                    img2.onload = function() {
+                        if (position == -1) {
+                            if (i == 0) {
+                                ctx.drawImage(img2, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                            } else
+                                ctx.drawImage(img2, card_positions[(i - 1) * 2] - cardx_size / 2, card_positions[(i - 1) * 2 + 1], cardx_size, cardy_size);
+                        } else {
+                            if (i - position === 0) {
+                                //ctx.drawImage(img2, canvas.width / 2 - cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                            } else
+                                ctx.drawImage(img2, card_positions[((i - position + 7) % 8) * 2] - cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1], cardx_size, cardy_size);
+                        }
+                    };
+
+                }
+            }
+        });
+        this.socket.on("my_turn", function(pos) {
+            if (pos === position) {
+                var btn = document.getElementById("my_turn");
+                btn.innerHTML = "UR TURN!";
+                console.log("UR TURN") //ur turn text box make
+                my_turn = true;
+                timer = null; //add timer here
+            } else {
+
+            }
+        });
+        this.socket.on("update_bets", function(raise_arry, current_pos) {
+            var elements = document.getElementsByClassName("betting_text");
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].parentNode.removeChild(elements[i]);
+                i--;
+            }
+            make_bets(raise_arry, current_pos);
+        });
         this.socket.on('set_leader', function(GAMESTATE) {
             leader = true;
             if (GAMESTATE === 0) {
@@ -172,8 +275,18 @@ Game.prototype = {
                 });
                 //canvas.width / 10, canvas.height / 2 - cardy_size / 2,
             }
-        })
+        });
         this.socket.on('send_positions', function(sentPositions) {
+
+            var btn = document.createElement("textBox")
+            btn.className = "pot_box"
+            btn.id = "pot_box"
+            btn.style.position = "absolute";
+            btn.style.left = canvas.width / 2 + 'px';
+            btn.style.top = canvas.height / 4 + 'px';
+            var body = document.getElementsByTagName("body")[0];
+            body.appendChild(btn);
+
             console.log(sentPositions)
             var elements = document.getElementsByClassName("sit-down-btn");
             for (let i = 0; i < elements.length; i++) {

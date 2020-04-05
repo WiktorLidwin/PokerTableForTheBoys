@@ -171,6 +171,26 @@
         font-size: 30px;
     }
     
+    .betting_text {
+        border-radius: 25px;
+        border: 2px solid rgb(255, 255, 0);
+        padding: 20px;
+        width: 75px;
+        height: 40px;
+        text-align: center;
+        font-size: 25px;
+    }
+    
+    .pot_box {
+        border-radius: 25px;
+        border: 2px solid rgb(0, 255, 255);
+        padding: 20px;
+        width: 100px;
+        height: 40px;
+        text-align: center;
+        font-size: 30px;
+    }
+    
     .my_turn {
         border-radius: 25px;
         border: 2px solid rgb(0, 0, 0);
