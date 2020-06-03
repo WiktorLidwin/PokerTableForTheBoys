@@ -16,7 +16,7 @@ folded = [];
 stillPlaying = [];
 raised_by = 0;
 current_pos = 0;
-past_time;
+past_time = 0;
 time_to_choose = 2000;
 big_blind = 50;
 small_blind = 25;
