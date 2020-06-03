@@ -93,7 +93,6 @@ function give_cards() {
 }
 
 function run_game() {
-
     for (let i = 0; i < 3; i++) {
         players[i] = new PLAYER();
         players[i].hand = [null, null, null, null, null, null, null, null, null, null];
@@ -429,6 +428,5 @@ function highCard(cards) {
     }
     return temp
 }
-
 
 run_game();

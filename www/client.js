@@ -1,6 +1,6 @@
 let server;
 var game;
-var canvas = document.querySelector('canvas');
+var canvas = Document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 var ctx = canvas.getContext("2d");
@@ -540,3 +540,4 @@ function draw_image(i, board) {
 
     }
 }
+

@@ -3,7 +3,7 @@ ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
 deck = [];
 players = [];
 currect_deck = [];
-flop = []
+flop = [];
 turn = null;
 river = null;
 hands = [
@@ -86,8 +86,8 @@ function give_cards() {
         deck.shift();
         cards[1] = deck[0];
         deck.shift();
-        console.log("Player " + i + " cards:")
-        console.log(cards)
+        console.log("Player " + i + " cards:");
+        console.log(cards);
         players[i].cards = cards;
     }
 }
@@ -436,6 +436,5 @@ function highCard(cards) {
     }
     return temp
 }
-
 
 run_game();
