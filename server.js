@@ -16,6 +16,7 @@ folded = [];
 stillPlaying = [];
 raised_by = 0;
 current_pos = 0;
+past_time = 0;
 time_to_choose = 2000;
 big_blind = 50;
 small_blind = 25;
@@ -827,10 +828,3 @@ function highCard(cards) {
     }
     return temp
 }
-
-function drawPlayers() {
-    for (let i = 0; i < players.length;i++){
-        console.log(players[i].position)
-    }
-}
-
