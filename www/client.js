@@ -1,6 +1,6 @@
 let server;
 var game;
-var canvas = Document.querySelector('canvas');
+var canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 var ctx = canvas.getContext("2d");
@@ -216,7 +216,7 @@ Game.prototype = {
                             console.log(card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1])
                             if (i - position === 0) {
                                 console.log("bruh1")
-                                    //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                                //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
                             } else
                                 ctx.drawImage(img, card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1], cardx_size, cardy_size);
                         }
@@ -295,17 +295,17 @@ Game.prototype = {
             }
             if (position === -1) {
                 console.log(sentPositions)
-                console.log("HJERE")
+                console.log("HERE")
                 canvas.style.display = "block"
                 positions = sentPositions;
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 8; i++) {
                     if (positions[i] === 0) {
                         var btn = document.createElement("button");
-                        btn.className = "sit-down-btn"
+                        btn.className = "sit-down-btn";
                         btn.innerHTML = "Sit Down";
                         btn.style.position = "absolute";
                         if (i > 2 && i < 6) {
-                            console.log(card_positions[(i - 1) * 2 + 1] + cardy_size)
+                            console.log(card_positions[(i - 1) * 2 + 1] + cardy_size);
                             btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
                             btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
                         } else {
@@ -314,7 +314,7 @@ Game.prototype = {
                         }
                         var body = document.getElementsByTagName("body")[0];
                         body.appendChild(btn);
-                        btn.addEventListener("click", function() {
+                        btn.addEventListener("pointerover", function() {
                             console.log("clicked on btn:" + i)
                             if (current_sit_down_btn_clicked !== null) {
                                 current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
@@ -370,58 +370,17 @@ Game.prototype = {
                         })
                     }
                     if (positions[0] === 0) {
-                        var btn = document.createElement("button");
-                        btn.className = "sit-down-btn"
-                        btn.innerHTML = "Sit Down";
-                        btn.style.position = "absolute";
-                        btn.style.left = canvas.width / 2 + 'px';
-                        btn.style.top = canvas.height / 4 * 3 + 'px';
+                        var div = document.createElement("IMG");
+                        div.setAttribute("src", "https://i.ya-webdesign.com/images/transparent-visor-poker-dealer-10.png");
+                        div.setAttribute("width", "20%");
+                        div.setAttribute("height", "30%");
+                        div.setAttribute("alt", "dealer");
+                        div.className = "Dealer";
+                        div.style.position = "absolute";
+                        div.style.left = canvas.width / 2.2 + 'px';
+                        div.style.top = canvas.height / 4.8 * 3 + 'px';
                         var body = document.getElementsByTagName("body")[0];
-                        body.appendChild(btn);
-                        btn.addEventListener("click", function() {
-                            console.log("clicked on btn:" + -1)
-                            if (current_sit_down_btn_clicked !== null) {
-                                current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
-                                current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);
-                            }
-                            var x = document.createElement("input");
-                            current_sit_down_btn_clicked = x;
-                            x.setAttribute("type", "text");
-                            x.setAttribute("placeHolder", "NickName: ");
-                            x.className = "name-text-box"
-                            x.style.position = 'absolute';
-                            x.style.left = canvas.width / 2 - 10 + 'px';
-                            x.style.top = canvas.height / 4 * 3 + 48 + 'px';
-                            var body = document.getElementsByTagName("body")[0];
-                            body.appendChild(x);
-                            var btn = document.createElement("button");
-                            btn.className = "request-btn"
-                            btn.innerHTML = "Request Spot";
-                            btn.style.position = "absolute";
-                            btn.style.left = canvas.width / 2 - 10 + 'px';
-                            btn.style.top = canvas.height / 4 * 3 + 70 + 'px';
-                            var body = document.getElementsByTagName("body")[0];
-                            body.appendChild(btn);
-                            current_request_btn_clicked = btn;
-                            btn.addEventListener("click", function() {
-                                nickname = x.value;
-                                position = 0;
-                                console.log(nickname);
-                                console.log(position);
-                                delete_sit_down_btns();
-
-                                var user_profile_box = document.createElement("textBox")
-                                user_profile_box.id = "user_profile_box"
-                                user_profile_box.className = "user_profile_box"
-                                user_profile_box.style.position = "absolute";
-                                user_profile_box.style.left = canvas.width / 2 + 'px';
-                                user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
-                                var body = document.getElementsByTagName("body")[0];
-                                body.appendChild(user_profile_box);
-                                create_game_btns();
-                                that.socket.emit('login', nickname, 1000, position)
-                            })
-                        })
+                        body.appendChild(div);
 
                     }
                 }
@@ -434,29 +393,29 @@ Game.prototype = {
 
         });
         this.socket.on('update_other_profiles', function(nicknames, positions, chips) {
-                console.log("update_other_profiles")
-                var elements = document.getElementsByClassName("other_user_profile");
-                for (let i = 0; i < elements.length; i++) {
-                    elements[i].parentNode.removeChild(elements[i]);
-                    i--;
+            console.log("update_other_profiles")
+            var elements = document.getElementsByClassName("other_user_profile");
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].parentNode.removeChild(elements[i]);
+                i--;
+            }
+            console.log(nicknames, positions, chips)
+            for (let i = 0; i < nicknames.length; i++) {
+                if (nicknames[i] !== null && i != position) {
+                    if (position === -1)
+                        create_player_profile(nicknames[i], (i) % 8, chips[i])
+                    else
+                        create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
                 }
-                console.log(nicknames, positions, chips)
-                for (let i = 0; i < nicknames.length; i++) {
-                    if (nicknames[i] !== null && i != position) {
-                        if (position === -1)
-                            create_player_profile(nicknames[i], (i) % 8, chips[i])
-                        else
-                            create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
-                    }
-                }
+            }
 
-            })
-            // this.socket.on('hand', function(hand) {
-            //     console.log(hand)
-            // });
-            //this.socket.emit('login', "Thictor", 1000, position)
-            //this.socket.emit('start_game');
-            //this.socket.emit('request_cards')
+        })
+        // this.socket.on('hand', function(hand) {
+        //     console.log(hand)
+        // });
+        //this.socket.emit('login', "Thictor", 1000, position)
+        //this.socket.emit('start_game');
+        //this.socket.emit('request_cards')
         this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards green
             if (board.length == 0) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -540,4 +499,3 @@ function draw_image(i, board) {
 
     }
 }
-
