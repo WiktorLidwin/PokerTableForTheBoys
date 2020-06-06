@@ -1,6 +1,8 @@
 let server;
 var game;
 var canvas = document.querySelector('canvas');
+var delete_sit_down = false;
+canvas.style.backgroundColor = "RGB(188, 225, 245)";
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 var ctx = canvas.getContext("2d");
@@ -10,7 +12,6 @@ let cardy_size = cardx_size * 3 / 2;
 var positions = [];
 var folded_card = new Image(cardx_size, cardy_size);
 var leader = false;
-var clicked_sit_down_btn = false;
 var current_sit_down_btn_clicked = null;
 var current_request_btn_clicked = null;
 var nickname = "";
@@ -20,7 +21,7 @@ playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
 var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
 
-console.log(card_positions)
+console.log(card_positions);
 window.onload = function() {
     game = new Game();
     game.init();
@@ -33,26 +34,34 @@ function noScroll() {
     window.scrollTo(0, 0);
 }
 
+canvas.addEventListener("pointerover", function(){
+    if (current_sit_down_btn_clicked !== null && delete_sit_down === false) {
+        current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
+    current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);}
+
+    current_sit_down_btn_clicked = null;
+    current_request_btn_clicked = null;
+});
 
 function make_bets(raise_arry, current_pos) {
     count = 0;
     for (let i = 0; i < 8; i++) {
-        if (raise_arry[i] != null && (count < current_pos || raise_arry[i] != 0)) { // && count < current_pos
+        if (raise_arry[i] != null && (count < current_pos || raise_arry[i] !== 0)) { // && count < current_pos
             count++;
-            var btn = document.createElement("textBox")
-            btn.className = "betting_text"
+            var btn = document.createElement("textBox");
+            btn.className = "betting_text";
             btn.style.position = "absolute";
-            if (raise_arry[i] != 0)
-                btn.innerHTML = raise_arry[i]
+            if (raise_arry[i] !== 0)
+                btn.innerHTML = raise_arry[i];
             else
-                btn.innerHTML = "Check"
-            console.log("*&&&(*&(*")
-            console.log(((i - position + 8) % 8) * 2)
-            if (position != -1) {
-                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px'
+                btn.innerHTML = "Check";
+            console.log("*&&&(*&(*");
+            console.log(((i - position + 8) % 8) * 2);
+            if (position !== -1) {
+                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px';
                 btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 'px';
             } else {
-                btn.style.left = betting_positions[i * 2] + 'px'
+                btn.style.left = betting_positions[i * 2] + 'px';
                 btn.style.top = betting_positions[i * 2 + 1] + 'px';
             }
             var body = document.getElementsByTagName("body")[0];
@@ -65,12 +74,13 @@ function make_bets(raise_arry, current_pos) {
 window.addEventListener('scroll', noScroll);
 
 function delete_sit_down_btns() {
+    delete_sit_down = true;
     var body = document.getElementsByTagName("body")[0];
     temp = body.childNodes;
     console.log(temp.length);
     for (let i = 0; i < temp.length; i++) {
         if (temp[i].className == "name-text-box" || temp[i].className == "request-btn" || temp[i].className == "sit-down-btn") {
-            body.removeChild(temp[i])
+            body.removeChild(temp[i]);
             i--;
         }
     }
@@ -97,7 +107,6 @@ my_turn = false;
 pot = 0;
 
 function create_game_btns() {
-
     var btn = document.createElement("textBox")
     btn.id = "my_turn"
     btn.className = "my_turn"
@@ -262,7 +271,7 @@ Game.prototype = {
             leader = true;
             if (GAMESTATE === 0) {
                 var btn = document.createElement("button");
-                btn.className = "start-game-btn"
+                btn.className = "start-game-btn";
                 btn.innerHTML = "Start Game";
                 btn.style.position = "absolute";
                 btn.style.left = canvas.width * 4 / 5 + 'px';
@@ -270,7 +279,7 @@ Game.prototype = {
                 var body = document.getElementsByTagName("body")[0];
                 body.appendChild(btn);
                 btn.addEventListener("click", function() {
-                    that.socket.emit('start_game')
+                    that.socket.emit('start_game');
                     btn.parentNode.removeChild(btn);
                 });
                 //canvas.width / 10, canvas.height / 2 - cardy_size / 2,
@@ -306,7 +315,7 @@ Game.prototype = {
                         btn.style.position = "absolute";
                         if (i > 2 && i < 6) {
                             console.log(card_positions[(i - 1) * 2 + 1] + cardy_size);
-                            btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
+                            btn.style.left = (  card_positions[(i - 1) * 2]) + 'px';
                             btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
                         } else {
                             btn.style.left = card_positions[(i - 1) * 2] + 'px';
@@ -336,7 +345,7 @@ Game.prototype = {
                             var body = document.getElementsByTagName("body")[0];
                             body.appendChild(x);
                             var btn = document.createElement("button");
-                            btn.className = "request-btn"
+                            btn.className = "request-btn";
                             btn.innerHTML = "Request Spot";
                             btn.style.position = "absolute";
                             if (i > 2 && i < 6) {
@@ -354,10 +363,10 @@ Game.prototype = {
                                 position = i;
                                 console.log(nickname);
                                 console.log(position);
-                                delete_sit_down_btns()
-                                var user_profile_box = document.createElement("textBox")
-                                user_profile_box.id = "user_profile_box"
-                                user_profile_box.className = "user_profile_box"
+                                delete_sit_down_btns();
+                                var user_profile_box = document.createElement("textBox");
+                                user_profile_box.id = "user_profile_box";
+                                user_profile_box.className = "user_profile_box";
                                 user_profile_box.style.position = "absolute";
                                 user_profile_box.style.left = canvas.width / 2 + 'px';
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
@@ -370,17 +379,17 @@ Game.prototype = {
                         })
                     }
                     if (positions[0] === 0) {
-                        var div = document.createElement("IMG");
-                        div.setAttribute("src", "https://i.ya-webdesign.com/images/transparent-visor-poker-dealer-10.png");
-                        div.setAttribute("width", "20%");
-                        div.setAttribute("height", "30%");
-                        div.setAttribute("alt", "dealer");
-                        div.className = "Dealer";
-                        div.style.position = "absolute";
-                        div.style.left = canvas.width / 2.2 + 'px';
-                        div.style.top = canvas.height / 4.8 * 3 + 'px';
+                        var dealer = document.createElement("IMG");
+                        dealer.setAttribute("src", "https://i.ya-webdesign.com/images/transparent-visor-poker-dealer-10.png");
+                        dealer.setAttribute("width", "20%");
+                        dealer.setAttribute("height", "30%");
+                        dealer.setAttribute("alt", "dealer");
+                        dealer.className = "Dealer";
+                        dealer.style.position = "absolute";
+                        dealer.style.left = canvas.width / 2.2 + 'px';
+                        dealer.style.top = canvas.height / 4.8 * 3 + 'px';
                         var body = document.getElementsByTagName("body")[0];
-                        body.appendChild(div);
+                        body.appendChild(dealer);
 
                     }
                 }

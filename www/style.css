@@ -1,7 +1,6 @@
 canvas {
     background-image: url('PokerTable6.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     background-size: 100% 100%;
     margin: 0 auto;
 }
@@ -90,13 +89,14 @@ height: 0%;
 .sit-down-btn {
     background-color: #3498db;
     /* Green */
-    border: none;
     color: white;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid black;
 }
 
 button {
@@ -200,6 +200,9 @@ button {
     font-size: 50px;
 }
 
+.request-btn:hover{
+    background-color: mediumspringgreen;
+}
 .name-text-box {
     padding: 0;
     height: 30px;
