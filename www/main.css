@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap');
 
 body {
     background: linear-gradient(-45deg, #000000, #003459, #007EA7);
@@ -8,16 +9,44 @@ body {
 .main-container {
     text-align: center;
     position: fixed;
-    padding: 10px 5px;
+    padding: 0 auto;
+    margin: 0 auto;
     top: 30%;
     left: 45%;
     /* bring your own prefixes */
     transform: translate(-30%, -45%);
 }
 
-input {
-    float: bottom;
+a {
+    margin: 3px auto;
+    border-radius: 25px;
+    width: 60%;
+    font-size: 1em;
+    font-family: 'Open Sans Condensed', sans-serif;
+    color: #494949 !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: #ffffff;
+    padding: 10px;
+    border: 4px solid #494949 !important;
+    display: inline-block;
+    transition: all 0.4s ease 0s;
 }
+
+a:hover {
+    color: #ffffff !important;
+    background: #4468f6;
+    border-color: #4468f6 !important;
+    transition: all 0.4s ease 0s;
+    box-shadow: 0 0 6px black;
+}
+
+.button-group {
+    position:  absolute;
+    width: 300px;
+    height:300px;
+}
+
 
 h1 {
     font-family: 'Montserrat', sans-serif;
