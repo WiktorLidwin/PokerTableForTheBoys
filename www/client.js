@@ -121,6 +121,7 @@ function create_game_btns() {
     btn.className = "group-buttons";
     btn.innerHTML = "Raise";
     btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 - 200 + cardx_size + 'px';
     btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
@@ -139,6 +140,7 @@ function create_game_btns() {
     btn.className = "group-buttons";
     btn.innerHTML = "Check";
     btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 + cardx_size - 50 + 'px';
     btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
@@ -156,6 +158,7 @@ function create_game_btns() {
     btn.className = "group-buttons";
     btn.innerHTML = "Fold";
     btn.style.position = "absolute";
+    btn.style.left = canvas.width / 2 + 100 + cardx_size + 'px';
     btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
