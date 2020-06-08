@@ -85,6 +85,19 @@ height: 180%;
 .btn4:hover::before {
 height: 0%;
 } */
+.group-buttons {
+    background-color: #4CAF50; /* Green background */
+    border: 1px solid green; /* Green border */
+    color: white; /* White text */
+    padding: 10px 24px; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    float: left; /* Float the buttons side by side */
+}
+
+/* Add a background color on hover */
+.group-buttons :hover {
+    background-color: #3e8e41;
+}
 
 .sit-down-btn {
     background-color: #3498db;
@@ -97,18 +110,6 @@ height: 0%;
     font-size: 16px;
     border-radius: 8px;
     border: 1px solid black;
-}
-
-button {
-    background-color: #3498db;
-    /* Green */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
 }
 
 .user_profile_box {
@@ -131,35 +132,6 @@ button {
     font-size: 30px;
 }
 
-.raise-btn {
-    border-radius: 25px;
-    border: 2px solid rgb(0, 0, 255);
-    padding: 20px;
-    width: 125px;
-    height: 75px;
-    text-align: center;
-    font-size: 30px;
-}
-
-.check-btn {
-    border-radius: 25px;
-    border: 2px solid rgb(0, 0, 255);
-    padding: 20px;
-    width: 125px;
-    height: 75px;
-    text-align: center;
-    font-size: 30px;
-}
-
-.fold-btn {
-    border-radius: 25px;
-    border: 2px solid rgb(0, 0, 255);
-    padding: 20px;
-    width: 125px;
-    height: 75px;
-    text-align: center;
-    font-size: 30px;
-}
 
 .other_user_profile {
     border-radius: 25px;
@@ -223,6 +195,12 @@ button {
     padding: 0 25px;
     background: #3460db;
     border: none;
+    /* Green */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
 }
 /* .sit-down-btn::before {
 top: 0;

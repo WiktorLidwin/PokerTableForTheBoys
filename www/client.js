@@ -107,21 +107,21 @@ my_turn = false;
 pot = 0;
 
 function create_game_btns() {
-    var btn = document.createElement("textBox")
-    btn.id = "my_turn"
-    btn.className = "my_turn"
+    var btn = document.createElement("textBox");
+    btn.id = "my_turn";
+    btn.className = "my_turn";
     btn.style.position = "absolute";
     btn.style.left = canvas.width / 2 + 'px';
-    btn.style.top = canvas.height / 4 - cardy_size + 'px';
+    btn.style.top = canvas.height / 4.5 - cardy_size + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
 
     btn = document.createElement("button");
-    btn.className = "raise-btn"
+    btn.id = "raise-btn";
+    btn.className = "group-buttons";
     btn.innerHTML = "Raise";
     btn.style.position = "absolute";
-    btn.style.left = canvas.width / 2 - 150 + cardx_size + 'px';
-    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -132,14 +132,14 @@ function create_game_btns() {
             var btn = document.getElementById("my_turn");
             btn.innerHTML = "";
         }
-    })
+    });
 
     btn = document.createElement("button");
-    btn.className = "check-btn"
+    btn.id= "check-btn";
+    btn.className = "group-buttons";
     btn.innerHTML = "Check";
     btn.style.position = "absolute";
-    btn.style.left = canvas.width / 2 + cardx_size + 'px';
-    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -152,11 +152,11 @@ function create_game_btns() {
     })
 
     btn = document.createElement("button");
-    btn.className = "fold-btn"
+    btn.id = "fold-btn";
+    btn.className = "group-buttons";
     btn.innerHTML = "Fold";
     btn.style.position = "absolute";
-    btn.style.left = canvas.width / 2 + 150 + cardx_size + 'px';
-    btn.style.top = canvas.height / 4 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -248,6 +248,7 @@ Game.prototype = {
                 }
             }
         });
+
         this.socket.on("my_turn", function(pos) {
             if (pos === position) {
                 var btn = document.getElementById("my_turn");
@@ -357,7 +358,7 @@ Game.prototype = {
                             }
                             var body = document.getElementsByTagName("body")[0];
                             body.appendChild(btn);
-                            current_request_btn_clicked = btn
+                            current_request_btn_clicked = btn;
                             btn.addEventListener("click", function() {
                                 nickname = x.value;
                                 position = i;

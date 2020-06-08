@@ -1,0 +1,36 @@
+
+body {
+    background: linear-gradient(-45deg, #000000, #003459, #007EA7);
+    background-size: 100000% 100000%;
+    animation: gradient 15s ease infinite;
+}
+
+.main-container {
+    text-align: center;
+    position: fixed;
+    padding: 10px 5px;
+    top: 30%;
+    left: 45%;
+    /* bring your own prefixes */
+    transform: translate(-30%, -45%);
+}
+
+input {
+    float: bottom;
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4em;
+}
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
