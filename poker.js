@@ -220,8 +220,6 @@ function check_hands(cards, player) {
         console.log("highCard" + highCard(cards))
         players[player].winning_hand = "highCard";
         players[player].hand[9] = highCard(cards);
-    } else {
-        console.log("retard")
     }
 }
 
