@@ -1,4 +1,6 @@
 let server;
+var dealer = document.createElement("IMG");
+dealer.style.visibility = 'hidden';
 var game;
 var canvas = document.querySelector('canvas');
 var delete_sit_down = false;
@@ -111,8 +113,8 @@ function create_game_btns() {
     btn.id = "my_turn";
     btn.className = "my_turn";
     btn.style.position = "absolute";
-    btn.style.left = canvas.width / 2 + 'px';
-    btn.style.top = canvas.height / 4.5 - cardy_size + 'px';
+    btn.style.left = "70%";
+    btn.style.top = "2%";
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
 
@@ -122,7 +124,7 @@ function create_game_btns() {
     btn.innerHTML = "Raise";
     btn.style.position = "absolute";
     btn.style.left = canvas.width / 2 - 200 + cardx_size + 'px';
-    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 100 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -141,7 +143,7 @@ function create_game_btns() {
     btn.innerHTML = "Check";
     btn.style.position = "absolute";
     btn.style.left = canvas.width / 2 + cardx_size - 50 + 'px';
-    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 100 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -159,7 +161,7 @@ function create_game_btns() {
     btn.innerHTML = "Fold";
     btn.style.position = "absolute";
     btn.style.left = canvas.width / 2 + 100 + cardx_size + 'px';
-    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 50 + 'px';
+    btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 100 + 'px';
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
     btn.addEventListener("click", function() {
@@ -255,8 +257,8 @@ Game.prototype = {
         this.socket.on("my_turn", function(pos) {
             if (pos === position) {
                 var btn = document.getElementById("my_turn");
-                btn.innerHTML = "UR TURN!";
-                console.log("UR TURN") //ur turn text box make
+                btn.innerHTML = nickname + "'s turn";
+                console.log("UR TURN"); //ur turn text box make
                 my_turn = true;
                 timer = null; //add timer here
             } else {
@@ -337,7 +339,7 @@ Game.prototype = {
                             current_sit_down_btn_clicked = x;
                             x.setAttribute("type", "text");
                             x.setAttribute("placeHolder", "NickName: ");
-                            x.className = "name-text-box"
+                            x.className = "name-text-box";
                             x.style.position = 'absolute';
                             if (i > 2 && i < 6) {
                                 x.style.left = (card_positions[(i - 1) * 2] - 10) + 'px';
@@ -373,9 +375,12 @@ Game.prototype = {
                                 user_profile_box.className = "user_profile_box";
                                 user_profile_box.style.position = "absolute";
                                 user_profile_box.style.left = canvas.width / 2 + 'px';
-                                user_profile_box.style.top = canvas.height / 4 * 3 - 100 + 'px';
+                                user_profile_box.style.top = canvas.height / 4 * 3 - 150 + 'px';
                                 var body = document.getElementsByTagName("body")[0];
                                 body.appendChild(user_profile_box);
+                                if (i > 2 && i < 6)
+                                    document.getElementById('dealer').style.top = canvas.height / 4.8 * 3 / 11 + 'px';
+                                    //tried to fix positioning but it won't work unless our table is circular :/
                                 create_game_btns();
 
                                 that.socket.emit('login', nickname, 1000, position)
@@ -383,15 +388,15 @@ Game.prototype = {
                         })
                     }
                     if (positions[0] === 0) {
-                        var dealer = document.createElement("IMG");
                         dealer.setAttribute("src", "https://i.ya-webdesign.com/images/transparent-visor-poker-dealer-10.png");
                         dealer.setAttribute("width", "20%");
                         dealer.setAttribute("height", "30%");
                         dealer.setAttribute("alt", "dealer");
-                        dealer.className = "Dealer";
+                        dealer.setAttribute('id', 'dealer');
                         dealer.style.position = "absolute";
                         dealer.style.left = canvas.width / 2.2 + 'px';
                         dealer.style.top = canvas.height / 4.8 * 3 + 'px';
+                        dealer.style.visibility = 'visible';
                         var body = document.getElementsByTagName("body")[0];
                         body.appendChild(dealer);
 
