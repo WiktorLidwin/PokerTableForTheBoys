@@ -100,9 +100,9 @@ function run_game() {
     }
 
     refill_deck();
-    shuffle(deck);
-    //console.log(deck)
-    //testing_deck = [];
+    //shuffle(deck);
+    console.log(deck)
+    testing_deck = [];
     // for (let i = 0; i < 5; i++) { //straight flush Checker
     //     testing_deck.push(deck[i + 7]);
     // }
@@ -138,12 +138,25 @@ function run_game() {
     // for (let i = 0; i < 2; i++) { //1s
     //     testing_deck.push(deck[i * 13 + 5]);
     // }
-    // testing_deck.push(deck[8]);
-    // testing_deck.push(deck[10]);
-    // testing_deck.push(deck[11]);
-    // console.log("(((((")
-    //console.log(testing_deck);
-    //check_hands(testing_deck);
+    testing_deck.push(deck[7]);
+    testing_deck.push(deck[2]);
+    testing_deck.push(deck[11]);
+    for (let i = 0; i < 4; i++) { //full
+        testing_deck.push(deck[i * 13 + 12]);
+    }
+    // for (let i = 0; i < 2; i++) { //full
+    //     testing_deck.push(deck[i * 13 + 9]);
+    // }
+
+    // for (let i = 0; i < 3; i++) { //full
+    //     testing_deck.push(deck[i * 13 + 8]);
+    // }
+    //testing_deck.push(deck[8]);
+    //testing_deck.push(deck[10]);
+    //testing_deck.push(deck[11]);
+    console.log("(((((")
+    console.log(testing_deck);
+    check_hands(testing_deck);
     give_cards();
     // for (let i = 0; i < players.length; i++) {
     //     check_hands(players[i].cards.concat(currect_deck), i);
@@ -300,7 +313,8 @@ function staightFlush(cards) {
 
 }
 
-function quads(cards) {
+function quads(cards) { //fix
+
     for (let i = 0; i < cards.length; i++) {
         count = 0;
         for (let z = i; z < cards.length; z++) {
@@ -311,12 +325,12 @@ function quads(cards) {
             temp2 = [];
             temp = -1;
             for (let x = 0; x < cards.length; x++) {
-                if (temp != -1 && cards[i].rank != cards[x].rank) {
-                    temp = cards[x].rank;
+                if (temp < ranks.indexOf(cards[x].rank) && cards[i].rank != cards[x].rank) {
+                    temp = ranks.indexOf(cards[x].rank);
                 }
             }
-            temp2[0] = ranks.indexOf(cards[i].rank) + 2
-            temp2[1] = temp;
+            temp2[0] = cards[i].rank;
+            temp2[1] = ranks[temp];
             return temp2;
         }
     }
@@ -324,14 +338,32 @@ function quads(cards) {
 }
 
 function fullHouse(cards) {
-    if (twoPair(cards) && threeOfAKind(cards)) {
+    // if (twoPair(cards) && threeOfAKind(cards)) {
+    //     temp4 = [];
+    //     temp4[0] = threeOfAKind(cards)[0];
+    //     if (twoPair(cards)[0] == temp4[0])
+    //         temp4[1] = twoPair(cards)[1]
+    //     else
+    //         temp4[1] = twoPair(cards)[0]
+    //     return temp4;
+    // }
+    // return 0;
+    temp5 = threeOfAKind(cards)
+    if (temp5) {
         temp4 = [];
-        temp4[0] = threeOfAKind(cards)[0];
-        if (twoPair(cards)[0] == temp4[0])
-            temp4[1] = twoPair(cards)[1]
-        else
-            temp4[1] = twoPair(cards)[0]
-        return temp4;
+        for (let x = 0; x < cards.length; x++) {
+            if (temp5[0] != cards[x].rank) {
+                temp4.push(cards[x]);
+            }
+        }
+        z = onePair(temp4)
+        if (z) {
+            temp6 = [];
+            temp6.push(temp5[0])
+            temp6.push(z[0])
+            return temp6;
+        }
+
     }
     return 0;
 }
