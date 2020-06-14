@@ -36,10 +36,11 @@ function noScroll() {
     window.scrollTo(0, 0);
 }
 
-canvas.addEventListener("pointerover", function(){
+canvas.addEventListener("pointerover", function() {
     if (current_sit_down_btn_clicked !== null && delete_sit_down === false) {
         current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
-    current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);}
+        current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);
+    }
 
     current_sit_down_btn_clicked = null;
     current_request_btn_clicked = null;
@@ -138,7 +139,7 @@ function create_game_btns() {
     });
 
     btn = document.createElement("button");
-    btn.id= "check-btn";
+    btn.id = "check-btn";
     btn.className = "group-buttons";
     btn.innerHTML = "Check";
     btn.style.position = "absolute";
@@ -181,9 +182,14 @@ Game.prototype = {
         this.socket = io.connect();
         this.socket.on('connect', function() {
             console.log("connected");
-            // document.getElementById('info').textContent = 'give yourself a nickname :)';
-            // document.getElementById('nickWrapper').style.display = 'block';
-            // document.getElementById('nicknameInput').focus();
+            temp = window.location.href.split('/');
+            roomid = temp[temp.length - 2];
+            console.log(roomid);
+            console.log("hi")
+            that.socket.emit('in_game_room', roomid)
+                // document.getElementById('info').textContent = 'give yourself a nickname :)';
+                // document.getElementById('nickWrapper').style.display = 'block';
+                // document.getElementById('nicknameInput').focus();
         });
         this.socket.on("pot_update", function(new_pot) {
             pot = new_pot;
@@ -230,7 +236,7 @@ Game.prototype = {
                             console.log(card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1])
                             if (i - position === 0) {
                                 console.log("bruh1")
-                                //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
+                                    //ctx.drawImage(img, canvas.width / 2 + cardx_size / 2, canvas.height / 4 * 3, cardx_size, cardy_size);
                             } else
                                 ctx.drawImage(img, card_positions[((i - position + 7) % 8) * 2] + cardx_size / 2, card_positions[((i - position + 7) % 8) * 2 + 1], cardx_size, cardy_size);
                         }
@@ -321,7 +327,7 @@ Game.prototype = {
                         btn.style.position = "absolute";
                         if (i > 2 && i < 6) {
                             console.log(card_positions[(i - 1) * 2 + 1] + cardy_size);
-                            btn.style.left = (  card_positions[(i - 1) * 2]) + 'px';
+                            btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
                             btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
                         } else {
                             btn.style.left = card_positions[(i - 1) * 2] + 'px';
@@ -380,7 +386,7 @@ Game.prototype = {
                                 body.appendChild(user_profile_box);
                                 if (i > 2 && i < 6)
                                     document.getElementById('dealer').style.top = canvas.height / 4.8 * 3 / 11 + 'px';
-                                    //tried to fix positioning but it won't work unless our table is circular :/
+                                //tried to fix positioning but it won't work unless our table is circular :/
                                 create_game_btns();
 
                                 that.socket.emit('login', nickname, 1000, position)
@@ -411,29 +417,29 @@ Game.prototype = {
 
         });
         this.socket.on('update_other_profiles', function(nicknames, positions, chips) {
-            console.log("update_other_profiles")
-            var elements = document.getElementsByClassName("other_user_profile");
-            for (let i = 0; i < elements.length; i++) {
-                elements[i].parentNode.removeChild(elements[i]);
-                i--;
-            }
-            console.log(nicknames, positions, chips)
-            for (let i = 0; i < nicknames.length; i++) {
-                if (nicknames[i] !== null && i != position) {
-                    if (position === -1)
-                        create_player_profile(nicknames[i], (i) % 8, chips[i])
-                    else
-                        create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
+                console.log("update_other_profiles")
+                var elements = document.getElementsByClassName("other_user_profile");
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].parentNode.removeChild(elements[i]);
+                    i--;
                 }
-            }
+                console.log(nicknames, positions, chips)
+                for (let i = 0; i < nicknames.length; i++) {
+                    if (nicknames[i] !== null && i != position) {
+                        if (position === -1)
+                            create_player_profile(nicknames[i], (i) % 8, chips[i])
+                        else
+                            create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
+                    }
+                }
 
-        })
-        // this.socket.on('hand', function(hand) {
-        //     console.log(hand)
-        // });
-        //this.socket.emit('login', "Thictor", 1000, position)
-        //this.socket.emit('start_game');
-        //this.socket.emit('request_cards')
+            })
+            // this.socket.on('hand', function(hand) {
+            //     console.log(hand)
+            // });
+            //this.socket.emit('login', "Thictor", 1000, position)
+            //this.socket.emit('start_game');
+            //this.socket.emit('request_cards')
         this.socket.on('send_cards', function(cards, foldedPlayers, playingPlayers, board, fold) { //if fold make cards green
             if (board.length == 0) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height)

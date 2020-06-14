@@ -2,16 +2,31 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="room.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+
+    <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css" media="screen,projection" />
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-<div class="container">
-    <canvas></canvas>
-</div>
-<script src="/socket.io/socket.io.js">
-</script>
-<script src='client.js'></script>
+    <div class="main-container" style="text-align: center; align-items: center;">
+        <div class="center">
+            <h1 class="text-light"><span style="color: #FFFFFF; -webkit-text-stroke: 2px black">JFF Poker</span></h1>
+            <div class="button-group" id="btn_grp" role="group" align="center">
+                <div class="input-field col s6">
+                    <input id="input_text" type="text" data-length="10" placeholder="Room ID..." style="color:#66ddcd;text-align: center; width: 60%;">
+                    <label for="input_text"></label>
+                </div>
+                <a class="room_button" id="join_room">Join a room</a>
+                <a class="room_button" id="create_room">Create a room</a>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>
