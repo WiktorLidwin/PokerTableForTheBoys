@@ -717,17 +717,16 @@ function royalFlush(cards) {
 }
 
 function staightFlush(cards) {
-    if (cards.length < 5) {
-        return 0;
-    }
-    for (let i = 0; i < cards.length - 4; i++) {
-        if (ranks.indexOf(cards[i + 1].rank) == ranks.indexOf(cards[i].rank) - 1 && ranks.indexOf(cards[i + 2].rank) == ranks.indexOf(cards[i].rank) - 2 && ranks.indexOf(cards[i + 3].rank) == ranks.indexOf(cards[i].rank) - 3 && ranks.indexOf(cards[i + 4].rank) == ranks.indexOf(cards[i].rank) - 4 && cards[i].suit == cards[i + 1].suit && cards[i + 1].suit == cards[i + 2].suit && cards[i + 2].suit == cards[i + 3].suit && cards[i + 3].suit == cards[i + 4].suit) {
-            return ranks.indexOf(cards[i].rank);
+    for (let i = 0; i < cards.length; i++) {
+        temp = []
+        for (let z = i; z < cards.length; z++) {
+            if (cards[i].suit === cards[z].suit)
+                temp.push(cards[z])
         }
+        if (temp.length >= 5)
+            return straight(temp);
     }
-    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3 && cards[cards.length - 1].suit == cards[cards.length - 2].suit && cards[cards.length - 1].suit == cards[cards.length - 3].suit && cards[cards.length - 1].suit == cards[cards.length - 4].suit && cards[cards.length - 1].suit == cards[cards.length - 5].suit) {
-        return 3;
-    }
+
     return 0;
 
 }
@@ -791,12 +790,17 @@ function flush(cards) {
 }
 
 function straight(cards) {
-    for (let i = 0; i < cards.length - 4; i++) {
-        if (ranks.indexOf(cards[i + 1].rank) == ranks.indexOf(cards[i].rank) - 1 && ranks.indexOf(cards[i + 2].rank) == ranks.indexOf(cards[i].rank) - 2 && ranks.indexOf(cards[i + 3].rank) == ranks.indexOf(cards[i].rank) - 3 && ranks.indexOf(cards[i + 4].rank) == ranks.indexOf(cards[i].rank) - 4) {
-            return ranks.indexOf(cards[i].rank);
+    card_ranks = [];
+    for (let i = 0; i < cards.length; i++) {
+        if (card_ranks.indexOf(cards[i].rank) == -1)
+            card_ranks.push(cards[i].rank)
+    }
+    for (let i = 0; i < card_ranks.length - 4; i++) {
+        if (ranks.indexOf(card_ranks[i + 1]) == ranks.indexOf(card_ranks[i]) - 1 && ranks.indexOf(card_ranks[i + 2]) == ranks.indexOf(card_ranks[i]) - 2 && ranks.indexOf(card_ranks[i + 3]) == ranks.indexOf(card_ranks[i]) - 3 && ranks.indexOf(card_ranks[i + 4]) == ranks.indexOf(card_ranks[i]) - 4) {
+            return ranks.indexOf(card_ranks[i + 4]);
         }
     }
-    if (ranks.indexOf(cards[cards.length - 1].rank) == 12 && ranks.indexOf(cards[cards.length - 2].rank) == 0 && ranks.indexOf(cards[cards.length - 3].rank) == 1 && ranks.indexOf(cards[cards.length - 4].rank) == 2 && ranks.indexOf(cards[cards.length - 5].rank) == 3) {
+    if (ranks.indexOf(card_ranks[card_ranks.length - 1]) == 12 && ranks.indexOf(card_ranks[card_ranks.length - 2]) == 0 && ranks.indexOf(card_ranks[card_ranks.length - 3]) == 1 && ranks.indexOf(card_ranks[card_ranks.length - 4]) == 2 && ranks.indexOf(card_ranks[card_ranks.length - 5]) == 3) {
         return 3;
     }
     return 0;
