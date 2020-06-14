@@ -60,8 +60,8 @@ function make_bets(raise_arry, current_pos) {
             console.log("*&&&(*&(*");
             console.log(((i - position + 8) % 8) * 2);
             if (position !== -1) {
-                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px';
-                btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 'px';
+                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] - 50 + 'px';
+                btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 50 + 'px';
             } else {
                 btn.style.left = betting_positions[i * 2] + 'px';
                 btn.style.top = betting_positions[i * 2 + 1] + 'px';
@@ -262,7 +262,8 @@ Game.prototype = {
                 my_turn = true;
                 timer = null; //add timer here
             } else {
-
+                var btn = document.getElementById("my_turn");
+                btn.innerHTML = players[pos].nickname + "'s turn";
             }
         });
         this.socket.on("update_bets", function(raise_arry, current_pos) {
@@ -372,7 +373,7 @@ Game.prototype = {
                                 delete_sit_down_btns();
                                 var user_profile_box = document.createElement("textBox");
                                 user_profile_box.id = "user_profile_box";
-                                user_profile_box.className = "user_profile_box";
+                                user_profile_box.className ="user_profile_box";
                                 user_profile_box.style.position = "absolute";
                                 user_profile_box.style.left = canvas.width / 2 + 'px';
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 150 + 'px';

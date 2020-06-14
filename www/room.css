@@ -46,7 +46,6 @@ body {
     border-radius: 25px;
     border: 2px solid rgb(255, 0, 0);
     padding: 20px;
-    width: 125px;
     text-align: center;
     font-size: 30px;
 }
@@ -66,8 +65,7 @@ body {
     border-radius: 25px;
     border: 2px solid rgb(0, 0, 0);
     padding: 20px;
-    width: 75px;
-    height: 40px;
+    width: 125px;
     text-align: center;
     font-size: 30px;
 }
