@@ -128,6 +128,7 @@ io.sockets.on('connection', function(socket) {
     //socket.emit('update_other_profiles', nicknames, positions, players_chips);
 
     socket.on('request_to_join_room', function(roomid) {
+        console.log('request_to_join_room')
         roomIndex = findroomwithid(roomid)
         if (roomIndex != -1) {
             console.log("found")
@@ -254,29 +255,31 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function() {
         roomIndex = findroomwithid(socket.roomid);
         console.log("dc")
-        console.log(rooms[roomIndex].users)
-        for (let i = 0; i < rooms[roomIndex].players.length; i++) {
-            if (socket.id === rooms[roomIndex].players[i].socketid) {
-                rooms[roomIndex].positions[players[i].position] = 0;
-                rooms[roomIndex].nicknames[players[i].position] = null;
-                rooms[roomIndex].players_chips[players[i].position] = 0;
-                rooms[roomIndex].players.splice(i, 1);
+        if (roomIndex != -1) {
+            console.log(rooms[roomIndex].users)
+            for (let i = 0; i < rooms[roomIndex].players.length; i++) {
+                if (socket.id === rooms[roomIndex].players[i].socketid) {
+                    rooms[roomIndex].positions[players[i].position] = 0;
+                    rooms[roomIndex].nicknames[players[i].position] = null;
+                    rooms[roomIndex].players_chips[players[i].position] = 0;
+                    rooms[roomIndex].players.splice(i, 1);
+                }
             }
-        }
-        for (let i = 0; i < users.length; i++) {
-            if (socket.id === users[i]) {
-                users.splice(i, 1);
+            for (let i = 0; i < rooms[roomIndex].users.length; i++) {
+                if (socket.id === rooms[roomIndex].users[i]) {
+                    rooms[roomIndex].users.splice(i, 1);
+                }
             }
-        }
-        if (socket.leader && players.length !== 0) {
-            rooms[roomIndex].players[0].leader = true;
-            console.log("new leader"); //test this
-            io.to(rooms[roomIndex].players[0].socketid).emit('set_leader', rooms[roomIndex].GAMESTATE);
-        }
-        if (rooms[roomIndex].users.length === 0) {
-            rooms.splice(roomIndex, 1);
-            //rooms[roomIndex].GAMESTATE = 0; //delete room?
+            if (socket.leader && players.length !== 0) {
+                rooms[roomIndex].players[0].leader = true;
+                console.log("new leader"); //test this
+                io.to(rooms[roomIndex].players[0].socketid).emit('set_leader', rooms[roomIndex].GAMESTATE);
+            }
+            if (rooms[roomIndex].users.length === 0) {
+                rooms.splice(roomIndex, 1);
+                //rooms[roomIndex].GAMESTATE = 0; //delete room?
 
+            }
         }
     })
 

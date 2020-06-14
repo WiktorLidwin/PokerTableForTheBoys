@@ -138,12 +138,17 @@ function run_game() {
     // for (let i = 0; i < 2; i++) { //1s
     //     testing_deck.push(deck[i * 13 + 5]);
     // }
-    testing_deck.push(deck[7]);
+    testing_deck.push(deck[5]);
     testing_deck.push(deck[2]);
     testing_deck.push(deck[11]);
-    for (let i = 0; i < 4; i++) { //full
-        testing_deck.push(deck[i * 13 + 12]);
-    }
+    testing_deck.push(deck[3]);
+    //testing_deck.push(deck[3]);
+    testing_deck.push(deck[1]);
+    testing_deck.push(deck[4]);
+
+    // for (let i = 0; i < 4; i++) { //full
+    //     testing_deck.push(deck[i * 13 + 12]);
+    // }
     // for (let i = 0; i < 2; i++) { //full
     //     testing_deck.push(deck[i * 13 + 9]);
     // }
@@ -382,6 +387,16 @@ function flush(cards) {
 }
 
 function straight(cards) {
+    card_ranks = [];
+    for (let i = 0; i < cards.length - 4; i++) {
+        if (card_ranks.indexOf(cards[i].rank) == -1)
+            card_ranks.push(cards[i].rank)
+    }
+    for (let i = 0; i < card_ranks.length - 4; i++) {
+        if (ranks.indexOf(cards[i + 1].rank) == ranks.indexOf(cards[i].rank) - 1 && ranks.indexOf(cards[i + 2].rank) == ranks.indexOf(cards[i].rank) - 2 && ranks.indexOf(cards[i + 3].rank) == ranks.indexOf(cards[i].rank) - 3 && ranks.indexOf(cards[i + 4].rank) == ranks.indexOf(cards[i].rank) - 4) {
+            return ranks.indexOf(cards[i].rank);
+        }
+    }
     for (let i = 0; i < cards.length - 4; i++) {
         if (ranks.indexOf(cards[i + 1].rank) == ranks.indexOf(cards[i].rank) - 1 && ranks.indexOf(cards[i + 2].rank) == ranks.indexOf(cards[i].rank) - 2 && ranks.indexOf(cards[i + 3].rank) == ranks.indexOf(cards[i].rank) - 3 && ranks.indexOf(cards[i + 4].rank) == ranks.indexOf(cards[i].rank) - 4) {
             return ranks.indexOf(cards[i].rank);
