@@ -22,6 +22,7 @@ var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
 var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
+var stack = 1000;
 
 console.log(card_positions);
 window.onload = function() {
@@ -102,7 +103,7 @@ function create_player_profile(nickname, pos, chips) {
         other_user_profile.style.left = card_positions[(pos - 1) * 2] + 'px';
         other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 100 + 'px';
     }
-    console.log(card_positions[(pos - 1) * 2], card_positions[(pos - 1) * 2 + 1])
+    console.log(card_positions[(pos - 1) * 2], card_positions[(pos - 1) * 2 + 1]);
     other_user_profile.innerHTML = nickname + ": " + chips;
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(other_user_profile);
@@ -111,13 +112,13 @@ my_turn = false;
 pot = 0;
 
 function create_game_btns() {
+    var body = document.getElementsByTagName("body")[0];
     var btn = document.createElement("textBox");
     btn.id = "my_turn";
     btn.className = "my_turn";
     btn.style.position = "absolute";
     btn.style.left = "70%";
     btn.style.top = "2%";
-    var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
 
     btn = document.createElement("button");
@@ -127,8 +128,9 @@ function create_game_btns() {
     btn.style.position = "absolute";
     btn.style.left = canvas.width / 2 - 200 + cardx_size + 'px';
     btn.style.top = canvas.height / 4.5 * 3 + cardy_size + 100 + 'px';
-    var body = document.getElementsByTagName("body")[0];
     body.appendChild(btn);
+
+
     btn.addEventListener("click", function() {
         if (my_turn) {
             // var amt = document.createElement('input');
@@ -300,8 +302,45 @@ Game.prototype = {
                 body.appendChild(btn);
                 btn.addEventListener("click", function() {
                     that.socket.emit('start_game');
+                    stack = stack_size.value;
                     btn.parentNode.removeChild(btn);
+                    small_blind.parentNode.removeChild(small_blind);
+                    big_blind.parentNode.removeChild(big_blind);
+                    stack_size.parentNode.removeChild(stack_size);
                 });
+
+                var small_blind = document.createElement('input');
+                var big_blind = document.createElement('input');
+                var stack_size = document.createElement('input');
+
+                small_blind.setAttribute('type', 'text');
+                big_blind.setAttribute('type', 'text');
+                stack_size.setAttribute('type', 'text');
+
+                small_blind.className = "settings";
+                big_blind.className = "settings";
+                stack_size.className = "settings";
+
+                small_blind.setAttribute('id', 'small_blind');
+                big_blind.setAttribute('id', 'big_blind');
+                stack_size.setAttribute('id', 'stack_size');
+
+                stack_size.style.top = canvas.height * 4 / 5 - 50 + 'px';
+                small_blind.style.top = canvas.height * 4 / 5 - 100 + 'px';
+                big_blind.style.top = canvas.height * 4 / 5 - 150 + 'px';
+
+                small_blind.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
+                big_blind.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
+                stack_size.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
+
+                small_blind.setAttribute('placeholder', 'Small Blind');
+                big_blind.setAttribute('placeholder', 'Big Blind');
+                stack_size.setAttribute('placeholder', 'Stack Size');
+
+                body.appendChild(small_blind);
+                body.appendChild(big_blind);
+                body.appendChild(stack_size);
+
                 //canvas.width / 10, canvas.height / 2 - cardy_size / 2,
             }
         });
@@ -383,6 +422,7 @@ Game.prototype = {
                                 position = i;
                                 console.log(nickname);
                                 console.log(position);
+                                console.log(stack);
                                 delete_sit_down_btns();
                                 var user_profile_box = document.createElement("textBox");
                                 user_profile_box.id = "user_profile_box";
@@ -399,7 +439,7 @@ Game.prototype = {
                                 //tried to fix positioning but it won't work unless our table is circular :/
                                 create_game_btns();
 
-                                that.socket.emit('login', nickname, 1000, position)
+                                that.socket.emit('login', nickname, stack, position)
                             })
                         })
                     }
@@ -422,7 +462,7 @@ Game.prototype = {
         });
 
         this.socket.on('player_profile', function(chips, cards) {
-            console.log("Profile update")
+            console.log("Profile update");
             var user_profile_box = document.getElementById("user_profile_box");
             user_profile_box.innerHTML = nickname + ": " + chips + "<br>" + cards;
 
