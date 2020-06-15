@@ -3,7 +3,7 @@ ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
 deck = [];
 players = [];
 currect_deck = [];
-flop = []
+flop = [];
 turn = null;
 river = null;
 hands = [
@@ -17,7 +17,7 @@ hands = [
     "twoPair",
     "onePair",
     "highCard"
-]
+];
 
 var PLAYER = function() {};
 PLAYER.prototype = {
@@ -27,7 +27,7 @@ PLAYER.prototype = {
         fold: false,
         winning_hand: "",
         hand: []
-    }
+    };
     //     royalFlush: 0,
     //     straightFlush: 0,
     //     quads: 0,
