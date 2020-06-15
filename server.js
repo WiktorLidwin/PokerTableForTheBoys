@@ -111,17 +111,47 @@ function findroomwithid(id) {
     return -1;
 }
 
+function random_key() {
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.split("");
+    key = "";
+    for (let i = 0; i < 6; i++) {
+        if (Math.random() > .5)
+            key += Math.floor(Math.random() * 10);
+        else
+            key += characters[Math.floor(Math.random() * characters.length)]
+    }
+    return key;
+}
+
 io.sockets.on('connection', function(socket) {
 
+    socket.on('create_room', function(small_blind, big_blind, stack_size) {
+        key = random_key();
+        console.log(key)
+        create_room(key)
+        roomIndex = findroomwithid(key)
+        rooms[roomIndex].big_blind = big_blind;
+        rooms[roomIndex].small_blind = small_blind;
+        socket.chips = stack_size;
+        console.log(socket.chips)
+        console.log(socket.id)
+        socket.emit('join_room', key)
+
+    });
 
     socket.on('in_game_room', function(roomid) {
+        roomIndex = findroomwithid(roomid)
+        if (roomIndex != -1) {
+            socket.roomid = roomid;
+            socket.join(roomid);
+            roomIndex = findroomwithid(socket.roomid);
+            rooms[roomIndex].users.push(socket.id);
+            socket.emit("send_positions", rooms[roomIndex].positions);
+            socket.emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
+        } else {
+            socket.emit('room_doesnt_exist')
+        }
 
-        socket.roomid = roomid;
-        socket.join(roomid);
-        roomIndex = findroomwithid(socket.roomid);
-        rooms[roomIndex].users.push(socket.id);
-        socket.emit("send_positions", rooms[roomIndex].positions);
-        socket.emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
     })
 
     //socket.emit("send_positions", positions);
@@ -141,20 +171,23 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('login', function(nickname, chips, position) {
-        //users.push(socket.id)
+        console.log(socket.id)
+            //users.push(socket.id)
         roomIndex = findroomwithid(socket.roomid);
         rooms[roomIndex].players[rooms[roomIndex].players.length] = new PLAYER();
         rooms[roomIndex].players[rooms[roomIndex].players.length - 1].hand = [null, null, null, null, null, null, null, null, null, null];
         rooms[roomIndex].players[rooms[roomIndex].players.length - 1].name = nickname;
         rooms[roomIndex].players[rooms[roomIndex].players.length - 1].socketid = socket.id;
-        rooms[roomIndex].players[rooms[roomIndex].players.length - 1].chips = chips;
+        console.log(socket.chips)
+        rooms[roomIndex].players[rooms[roomIndex].players.length - 1].chips = socket.chips != undefined ? socket.chips : chips;
         rooms[roomIndex].players[rooms[roomIndex].players.length - 1].position = position;
         rooms[roomIndex].positions[position] = socket.id;
         rooms[roomIndex].nicknames[position] = nickname;
-        rooms[roomIndex].players_chips[position] = chips;
-        console.log(chips)
+        rooms[roomIndex].players_chips[position] = socket.chips != undefined ? socket.chips : chips;
+        console.log(rooms[roomIndex].players_chips)
+        console.log(rooms[roomIndex].players)
         socket.leader = false;
-        socket.emit('player_profile', chips)
+        socket.emit('player_profile', rooms[roomIndex].players_chips[position])
         io.emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
         socket.broadcast.emit("send_positions", rooms[roomIndex].positions);
         if (rooms[roomIndex].players.length === 1) {
@@ -173,10 +206,10 @@ io.sockets.on('connection', function(socket) {
                 }
             }
         round(roomIndex)
-    })
+    });
     socket.on("fold", function() {
         roomIndex = findroomwithid(socket.roomid);
-        for (let i = 0; i < players.length; i++) {
+        for (let i = 0; i < rooms[roomIndex].players.length; i++) {
             if (rooms[roomIndex].players[i].socketid == socket.id) {
                 rooms[roomIndex].players[i].folded = true;
                 rooms[roomIndex].pot += rooms[roomIndex].players[i].chipsInPot;

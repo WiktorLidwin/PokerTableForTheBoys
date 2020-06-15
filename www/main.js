@@ -1,5 +1,14 @@
 var join_btn = document.getElementById('join_room');
 var create_btn = document.getElementById('create_room');
+
+var small_btn = document.getElementById('small_blind');
+var big_btn = document.getElementById('big_blind');
+var stack_btn = document.getElementById('stack_size');
+
+small_btn.placeholder = "25";
+big_btn.placeholder = "50";
+stack_btn.placeholder = "1000";
+
 var body = document.getElementsByTagName('body')[0];
 var clicked = 0;
 
@@ -21,10 +30,10 @@ join_btn.addEventListener('click', function() {
 create_btn.addEventListener('click', function() {
     if (clicked === 0) {
         clicked = 1;
-        socket.emit('request_to_create_room')
+        socket.emit('create_room', small_btn.value != "" ? small_btn.value : small_btn.placeholder, big_btn.value != "" ? big_btn.value : big_btn.placeholder, stack_btn.value != "" ? stack_btn.value : stack_btn.placeholder);
         console.log('request to create room')
             //join_btn.setAttribute('id', 'join_btn_altered')
-        
+
     }
 });
 
@@ -33,3 +42,7 @@ socket.on('room_doesnt_exist', function() {
     clicked = 0;
 });
 
+socket.on('join_room', function(key) {
+    console.log("??")
+    window.location.href = window.location.href + "game/" + key;
+})

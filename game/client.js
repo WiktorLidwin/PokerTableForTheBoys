@@ -199,6 +199,11 @@ Game.prototype = {
                 // document.getElementById('nickWrapper').style.display = 'block';
                 // document.getElementById('nicknameInput').focus();
         });
+        this.socket.on('room_doesnt_exist', function() {
+            ctx.font = "100px Verdana";
+            ctx.fillText("Room Doesnt Exist", canvas.width / 4, canvas.height / 3);
+
+        })
         this.socket.on("pot_update", function(new_pot) {
             pot = new_pot;
             btn = document.getElementById("pot_box")
@@ -275,8 +280,7 @@ Game.prototype = {
                 console.log("UR TURN"); //ur turn text box make
                 my_turn = true;
                 timer = null; //add timer here
-            } else {
-            }
+            } else {}
         });
 
         this.socket.on("update_bets", function(raise_arry, current_pos) {
@@ -386,7 +390,7 @@ Game.prototype = {
                                 delete_sit_down_btns();
                                 var user_profile_box = document.createElement("textBox");
                                 user_profile_box.id = "user_profile_box";
-                                user_profile_box.className ="user_profile_box";
+                                user_profile_box.className = "user_profile_box";
                                 user_profile_box.style.position = "absolute";
                                 user_profile_box.style.left = canvas.width / 2 + 'px';
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 150 + 'px';
