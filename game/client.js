@@ -22,12 +22,13 @@ var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
 var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
-var stack = 1000;
 
 console.log(card_positions);
 window.onload = function() {
     game = new Game();
     game.init();
+    var stack_size = prompt("Stack Size: ", "1000")
+
 };
 var Game = function() {
     this.socket = null;
@@ -308,39 +309,6 @@ Game.prototype = {
                     big_blind.parentNode.removeChild(big_blind);
                     stack_size.parentNode.removeChild(stack_size);
                 });
-
-                var small_blind = document.createElement('input');
-                var big_blind = document.createElement('input');
-                var stack_size = document.createElement('input');
-
-                small_blind.setAttribute('type', 'text');
-                big_blind.setAttribute('type', 'text');
-                stack_size.setAttribute('type', 'text');
-
-                small_blind.className = "settings";
-                big_blind.className = "settings";
-                stack_size.className = "settings";
-
-                small_blind.setAttribute('id', 'small_blind');
-                big_blind.setAttribute('id', 'big_blind');
-                stack_size.setAttribute('id', 'stack_size');
-
-                stack_size.style.top = canvas.height * 4 / 5 - 50 + 'px';
-                small_blind.style.top = canvas.height * 4 / 5 - 100 + 'px';
-                big_blind.style.top = canvas.height * 4 / 5 - 150 + 'px';
-
-                small_blind.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
-                big_blind.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
-                stack_size.style.left =  canvas.width * 4 / 5 + 14.895 + 'px';
-
-                small_blind.setAttribute('placeholder', 'Small Blind');
-                big_blind.setAttribute('placeholder', 'Big Blind');
-                stack_size.setAttribute('placeholder', 'Stack Size');
-
-                body.appendChild(small_blind);
-                body.appendChild(big_blind);
-                body.appendChild(stack_size);
-
                 //canvas.width / 10, canvas.height / 2 - cardy_size / 2,
             }
         });
@@ -400,8 +368,12 @@ Game.prototype = {
                             } else {
                                 x.style.left = card_positions[(i - 1) * 2] - 10 + 'px';
                                 x.style.top = card_positions[(i - 1) * 2 + 1] + 48 + 'px';
+
                             }
                             var body = document.getElementsByTagName("body")[0];
+
+                            body.appendChild(stack_size);
+
                             body.appendChild(x);
                             var btn = document.createElement("button");
                             btn.className = "request-btn";
