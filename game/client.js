@@ -22,13 +22,12 @@ var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
 var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
+var stack_size = prompt("Stack Size: ", "1000");
 
 console.log(card_positions);
 window.onload = function() {
     game = new Game();
     game.init();
-    var stack_size = prompt("Stack Size: ", "1000")
-
 };
 var Game = function() {
     this.socket = null;
@@ -303,11 +302,7 @@ Game.prototype = {
                 body.appendChild(btn);
                 btn.addEventListener("click", function() {
                     that.socket.emit('start_game');
-                    stack = stack_size.value;
                     btn.parentNode.removeChild(btn);
-                    small_blind.parentNode.removeChild(small_blind);
-                    big_blind.parentNode.removeChild(big_blind);
-                    stack_size.parentNode.removeChild(stack_size);
                 });
                 //canvas.width / 10, canvas.height / 2 - cardy_size / 2,
             }
@@ -371,9 +366,6 @@ Game.prototype = {
 
                             }
                             var body = document.getElementsByTagName("body")[0];
-
-                            body.appendChild(stack_size);
-
                             body.appendChild(x);
                             var btn = document.createElement("button");
                             btn.className = "request-btn";
@@ -394,7 +386,6 @@ Game.prototype = {
                                 position = i;
                                 console.log(nickname);
                                 console.log(position);
-                                console.log(stack);
                                 delete_sit_down_btns();
                                 var user_profile_box = document.createElement("textBox");
                                 user_profile_box.id = "user_profile_box";
@@ -411,7 +402,7 @@ Game.prototype = {
                                 //tried to fix positioning but it won't work unless our table is circular :/
                                 create_game_btns();
 
-                                that.socket.emit('login', nickname, stack, position)
+                                that.socket.emit('login', nickname, stack_size, position)
                             })
                         })
                     }
