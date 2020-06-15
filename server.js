@@ -125,16 +125,13 @@ function random_key() {
 
 io.sockets.on('connection', function(socket) {
 
-    socket.on('create_room', function(small_blind, big_blind, stack_size) {
+    socket.on('create_room', function(small_blind, big_blind) {
         key = random_key();
         console.log(key)
         create_room(key)
         roomIndex = findroomwithid(key)
         rooms[roomIndex].big_blind = big_blind;
         rooms[roomIndex].small_blind = small_blind;
-        socket.chips = stack_size;
-        console.log(socket.chips)
-        console.log(socket.id)
         socket.emit('join_room', key)
 
     });
