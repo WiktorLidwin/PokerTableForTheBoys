@@ -94,15 +94,16 @@ function create_player_profile(nickname, pos, chips) {
     var other_user_profile = document.createElement("textBox")
     other_user_profile.className = "other_user_profile"
     other_user_profile.style.position = "absolute";
+    other_user_profile.style.textAlign = "center";
     if (pos === 0) {
         other_user_profile.style.left = canvas.width / 2 + 'px';
-        other_user_profile.style.top = canvas.height / 4 * 3 - 100 + 'px';
+        other_user_profile.style.top = canvas.height / 4 * 3 - 150 + 'px';
     } else {
         other_user_profile.style.left = card_positions[(pos - 1) * 2] + 'px';
         other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 100 + 'px';
     }
     console.log(card_positions[(pos - 1) * 2], card_positions[(pos - 1) * 2 + 1])
-    other_user_profile.innerHTML = nickname + "\n" + chips;
+    other_user_profile.innerHTML = nickname + ": " + chips;
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(other_user_profile);
 }
@@ -130,6 +131,13 @@ function create_game_btns() {
     body.appendChild(btn);
     btn.addEventListener("click", function() {
         if (my_turn) {
+            // var amt = document.createElement('input');
+            // amt.setAttribute('value', '50');
+            // amt.setAttribute('max', '100');
+            // amt.setAttribute('type', 'range');
+            // amt.style.top = '50%';
+            // amt.style.left = '50%';
+            // body.appendChild(amt);
             amount = 50; //change this later
             that.socket.emit("raise", amount);
             my_turn = false;
@@ -149,12 +157,12 @@ function create_game_btns() {
     body.appendChild(btn);
     btn.addEventListener("click", function() {
         if (my_turn) {
-            that.socket.emit("check")
+            that.socket.emit("check");
             my_turn = false;
             var btn = document.getElementById("my_turn");
             btn.innerHTML = "";
         }
-    })
+    });
 
     btn = document.createElement("button");
     btn.id = "fold-btn";
@@ -167,7 +175,7 @@ function create_game_btns() {
     body.appendChild(btn);
     btn.addEventListener("click", function() {
         if (my_turn) {
-            that.socket.emit("fold")
+            that.socket.emit("fold");
             my_turn = false;
             var btn = document.getElementById("my_turn");
             btn.innerHTML = "";
@@ -268,10 +276,9 @@ Game.prototype = {
                 my_turn = true;
                 timer = null; //add timer here
             } else {
-                var btn = document.getElementById("my_turn");
-                btn.innerHTML = players[pos].nickname + "'s turn";
             }
         });
+
         this.socket.on("update_bets", function(raise_arry, current_pos) {
             var elements = document.getElementsByClassName("betting_text");
             for (let i = 0; i < elements.length; i++) {
@@ -383,6 +390,8 @@ Game.prototype = {
                                 user_profile_box.style.position = "absolute";
                                 user_profile_box.style.left = canvas.width / 2 + 'px';
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 150 + 'px';
+                                user_profile_box.style.textAlign = "center";
+
                                 var body = document.getElementsByTagName("body")[0];
                                 body.appendChild(user_profile_box);
                                 if (i > 2 && i < 6)
@@ -411,10 +420,11 @@ Game.prototype = {
                 }
             }
         });
+
         this.socket.on('player_profile', function(chips, cards) {
-            console.log("rofile update")
+            console.log("Profile update")
             var user_profile_box = document.getElementById("user_profile_box");
-            user_profile_box.innerHTML = nickname + ": " + chips + "\n" + cards;
+            user_profile_box.innerHTML = nickname + ": " + chips + "<br>" + cards;
 
         });
         this.socket.on('update_other_profiles', function(nicknames, positions, chips) {
@@ -428,7 +438,7 @@ Game.prototype = {
                 for (let i = 0; i < nicknames.length; i++) {
                     if (nicknames[i] !== null && i != position) {
                         if (position === -1)
-                            create_player_profile(nicknames[i], (i) % 8, chips[i])
+                            create_player_profile(nicknames[i], (i) % 8, chips[i]);
                         else
                             create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
                     }
@@ -524,3 +534,30 @@ function draw_image(i, board) {
 
     }
 }
+
+$('input[type=range]').wrap("<div class='range'></div>");
+var i = 1;
+
+$('.range').each(function() {
+    var n = this.getElementsByTagName('input')[0].value;
+    var x = (n / 100) * (this.getElementsByTagName('input')[0].offsetWidth - 8) - 12;
+    this.id = 'range' + i;
+    if (this.getElementsByTagName('input')[0].value == 0) {
+        this.className = "range"
+    } else {
+        this.className = "range rangeM"
+    }
+    this.innerHTML += "<style>#" + this.id + " input[type=range]::-webkit-slider-runnable-track {background:linear-gradient(to right, #3f51b5 0%, #3f51b5 " + n + "%, #515151 " + n + "%)} #" + this.id + ":hover input[type=range]:before{content:'" + n + "'!important;left: " + x + "px;} #" + this.id + ":hover input[type=range]:after{left: " + x + "px}</style>";
+    i++
+});
+
+$('input[type=range]').on("input", function() {
+    var a = this.value;
+    var p = (a / 100) * (this.offsetWidth - 8) - 12;
+    if (a == 0) {
+        this.parentNode.className = "range"
+    } else {
+        this.parentNode.className = "range rangeM"
+    }
+    this.parentNode.getElementsByTagName('style')[0].innerHTML += "#" + this.parentNode.id + " input[type=range]::-webkit-slider-runnable-track {background:linear-gradient(to right, #3f51b5 0%, #3f51b5 " + a + "%, #515151 " + a + "%)} #" + this.parentNode.id + ":hover input[type=range]:before{content:'" + a + "'!important;left: " + p + "px;} #" + this.parentNode.id + ":hover input[type=range]:after{left: " + p + "px}";
+})
