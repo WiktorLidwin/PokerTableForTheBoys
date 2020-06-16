@@ -163,6 +163,9 @@ function create_game_btns() {
             my_turn = false;
             var btn = document.getElementById("my_turn");
             btn.innerHTML = "";
+            btn = document.getElementById("check-btn");
+            btn.innerHTML = "Check";
+
         }
     });
 
@@ -184,6 +187,7 @@ function create_game_btns() {
         }
     })
 }
+global_raise = 0;
 var that = null;
 Game.prototype = {
     server: 0,
@@ -275,14 +279,25 @@ Game.prototype = {
             }
         });
 
-        this.socket.on("my_turn", function(pos) {
+        this.socket.on("my_turn", function(pos, nicknames, raise) {
             if (pos === position) {
-                var btn = document.getElementById("my_turn");
+                console.log(raise);
+                var btn = document.getElementById("check-btn");
+                if (raise != 0)
+                    btn.innerHTML = "Call " + raise;
+                else
+                    btn.innerHTML = "Check";
+                btn = document.getElementById("my_turn");
                 btn.innerHTML = nickname + "'s turn";
                 console.log("UR TURN"); //ur turn text box make
                 my_turn = true;
                 timer = null; //add timer here
-            } else {}
+            } else {
+                console.log("next_player's turn")
+                console.log(nicknames)
+                var btn = document.getElementById("my_turn");
+                btn.innerHTML = nicknames[pos] + "'s turn";
+            }
         });
 
         this.socket.on("update_bets", function(raise_arry, current_pos) {

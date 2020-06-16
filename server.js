@@ -185,7 +185,7 @@ io.sockets.on('connection', function(socket) {
         console.log(rooms[roomIndex].players)
         socket.leader = false;
         socket.emit('player_profile', rooms[roomIndex].players_chips[position])
-        io.emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
+        io.in(rooms[roomIndex].id).emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
         socket.broadcast.emit("send_positions", rooms[roomIndex].positions);
         if (rooms[roomIndex].players.length === 1) {
             socket.emit('set_leader', rooms[roomIndex].GAMESTATE);
@@ -213,7 +213,7 @@ io.sockets.on('connection', function(socket) {
                 rooms[roomIndex].players[i].chipsInPot = 0;
             }
         }
-        io.emit("pot_update", rooms[roomIndex].pot);
+        io.in(rooms[roomIndex].id).emit("pot_update", rooms[roomIndex].pot);
         round(roomIndex)
     });
     socket.on("raise", function(amount) {
@@ -289,9 +289,9 @@ io.sockets.on('connection', function(socket) {
             console.log(rooms[roomIndex].users)
             for (let i = 0; i < rooms[roomIndex].players.length; i++) {
                 if (socket.id === rooms[roomIndex].players[i].socketid) {
-                    rooms[roomIndex].positions[players[i].position] = 0;
-                    rooms[roomIndex].nicknames[players[i].position] = null;
-                    rooms[roomIndex].players_chips[players[i].position] = 0;
+                    rooms[roomIndex].positions[rooms[roomIndex].players[i].position] = 0;
+                    rooms[roomIndex].nicknames[rooms[roomIndex].players[i].position] = null;
+                    rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] = 0;
                     rooms[roomIndex].players.splice(i, 1);
                 }
             }
@@ -300,7 +300,7 @@ io.sockets.on('connection', function(socket) {
                     rooms[roomIndex].users.splice(i, 1);
                 }
             }
-            if (socket.leader && players.length !== 0) {
+            if (socket.leader && rooms[roomIndex].players.length !== 0) {
                 rooms[roomIndex].players[0].leader = true;
                 console.log("new leader"); //test this
                 io.to(rooms[roomIndex].players[0].socketid).emit('set_leader', rooms[roomIndex].GAMESTATE);
@@ -375,7 +375,7 @@ function round(roomIndex) {
         rooms[roomIndex].winner = rooms[roomIndex].stillPlaying[0]; //do something with this
         for (let i = 0; i < rooms[roomIndex].players.length; i++) {
             if (rooms[roomIndex].players[i].position === rooms[roomIndex].winner) {
-                io.emit("winner", [rooms[roomIndex].players[i].name]);
+                io.in(rooms[roomIndex].id).emit("winner", [rooms[roomIndex].players[i].name]);
                 rooms[roomIndex].players[i].chips += rooms[roomIndex].pot;
                 //add chips
             }
@@ -391,7 +391,7 @@ function round(roomIndex) {
             rooms[roomIndex].players[z].chipsInPot = 0;
         }
         rooms[roomIndex].pot = 0;
-        io.emit("pot_update", rooms[roomIndex].pot);
+        io.in(rooms[roomIndex].id).emit("pot_update", rooms[roomIndex].pot);
         rooms[roomIndex].raised_by = 0;
         make_preflop(roomIndex);
         rooms[roomIndex].current_pos = 0;
@@ -411,20 +411,28 @@ function round(roomIndex) {
 
         for (let z = 0; z < rooms[roomIndex].players.length; z++) {
             if (rooms[roomIndex].stillPlaying[rooms[roomIndex].current_pos] === rooms[roomIndex].players[z].position) {
-                io.emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
-                io.emit('update_bets', rooms[roomIndex].raise_arry, rooms[roomIndex].current_pos);
+                io.in(rooms[roomIndex].id).emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
+                io.in(rooms[roomIndex].id).emit('update_bets', rooms[roomIndex].raise_arry, rooms[roomIndex].current_pos);
                 rooms[roomIndex].time = new Date();
                 rooms[roomIndex].past_time = rooms[roomIndex].time.getTime();
                 rooms[roomIndex].made_move = false;
                 //io.to(players[z].socketid).emit("my_turn")
-                io.emit("my_turn", rooms[roomIndex].players[z].position)
+                max = 0;
+                for (let i = 0; i < rooms[roomIndex].raise_arry.length; i++) {
+                    if (rooms[roomIndex].raise_arry[i] > max) {
+                        max = rooms[roomIndex].raise_arry[i]
+                    }
+
+                }
+                console.log(max, Math.max(rooms[roomIndex].raise_arry), rooms[roomIndex].raise_arry[rooms[roomIndex].players[z].position])
+                io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_arry[rooms[roomIndex].players[z].position])
             }
         }
     } else {
         for (let z = 0; z < rooms[roomIndex].players.length; z++) {
             rooms[roomIndex].pot += rooms[roomIndex].players[z].chipsInPot;
         }
-        io.emit("pot_update", rooms[roomIndex].pot);
+        io.in(rooms[roomIndex].id).emit("pot_update", rooms[roomIndex].pot);
         for (let z = 0; z < rooms[roomIndex].players.length; z++) {
             rooms[roomIndex].players[z].chipsInPot = 0;
         }
@@ -464,12 +472,12 @@ function round(roomIndex) {
             // }
 
             console.log(rooms[roomIndex].winners);
-            io.emit("winner", rooms[roomIndex].winners, rooms[roomIndex].players_hands);
+            io.in(rooms[roomIndex].id).emit("winner", rooms[roomIndex].winners, rooms[roomIndex].players_hands);
             for (let i = 0; i < rooms[roomIndex].possible_winners.length; i++) {
                 rooms[roomIndex].players[rooms[roomIndex].possible_winners[i]].chips += rooms[roomIndex].pot / rooms[roomIndex].possible_winners.length; //side pot here
             }
             rooms[roomIndex].pot = 0;
-            io.emit("pot_update", rooms[roomIndex].pot);
+            io.in(rooms[roomIndex].id).emit("pot_update", rooms[roomIndex].pot);
             rooms[roomIndex].flop = [];
             rooms[roomIndex].turn = null;
             rooms[roomIndex].river = null;
@@ -524,6 +532,7 @@ function send_cards(roomIndex) {
             }
         }
         if (!temp) {
+            console.log("test1")
             io.to(rooms[roomIndex].users[i]).emit('send_cards', null, rooms[roomIndex].folded, rooms[roomIndex].stillPlaying, rooms[roomIndex].currect_deck);
         }
     }
