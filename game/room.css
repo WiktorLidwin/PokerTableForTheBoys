@@ -30,6 +30,9 @@ body {
     /* Float the buttons side by side */
 }
 
+img.cards {
+    z-index: 6;
+}
 
 /* Add a background color on hover */
 
@@ -79,11 +82,12 @@ body {
 
 .betting_text {
     border-radius: 25px;
-    border: 2px solid rgb(255, 255, 0);
+    border: none;
     padding: 20px;
     width: 75px;
     text-align: center;
     font-size: 25px;
+    font-weight: bold;
 }
 
 .pot_box {

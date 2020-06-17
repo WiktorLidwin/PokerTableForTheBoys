@@ -22,7 +22,7 @@ var playing_card = new Image(cardx_size, cardy_size);
 playing_card.src = "Cards/" + "red_back" + ".png";
 var card_positions = [canvas.width / 4, canvas.height / 4 * 3, canvas.width / 10, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4 - cardy_size, canvas.width / 2, canvas.height / 4 - cardy_size, canvas.width / 4 * 3, canvas.height / 4 - cardy_size, canvas.width / 10 * 9, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3]
 var betting_positions = [canvas.width / 2, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 4, canvas.height / 4 * 3 + cardy_size / 2, canvas.width / 10 + cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 4, canvas.width / 4 * 3, canvas.height / 4, canvas.width / 10 * 9 - cardx_size / 2, canvas.height / 2 - cardy_size / 2, canvas.width / 4 * 3, canvas.height / 4 * 3 - cardy_size / 2]
-var stack_size = prompt("Stack Size: ", "1000");
+var stack_size = null;
 
 console.log(card_positions);
 window.onload = function() {
@@ -63,10 +63,10 @@ function make_bets(raise_arry, current_pos) {
             console.log(((i - position + 8) % 8) * 2);
             if (position !== -1) {
                 btn.style.left = betting_positions[((i - position + 8) % 8) * 2] - 50 + 'px';
-                btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 50 + 'px';
+                btn.style.top = canvas.height / 4 * 3 - 200 + 'px';
             } else {
                 btn.style.left = betting_positions[i * 2] + 'px';
-                btn.style.top = betting_positions[i * 2 + 1] + 'px';
+                btn.style.top = canvas.height / 4 * 3 - 200 + 'px';
             }
             var body = document.getElementsByTagName("body")[0];
             body.appendChild(btn);
@@ -230,8 +230,10 @@ Game.prototype = {
                     console.log("i: " + i)
                     var img = new Image(cardx_size, cardy_size);
                     img.src = "Cards/" + players_hands[i][0].rank + players_hands[i][0].suit + ".png";
+                    img.className = "cards";
                     img2 = new Image(cardx_size, cardy_size);
                     img2.src = "Cards/" + players_hands[i][1].rank + players_hands[i][1].suit + ".png";
+                    img2.className = "cards";
                     // if (position != -1) {
                     //     btn.style.left = betting_positions[((i - position + 8) % 8) * 2] + 'px'
                     //     btn.style.top = betting_positions[((i - position + 8) % 8) * 2 + 1] + 'px';
@@ -427,7 +429,7 @@ Game.prototype = {
                                     document.getElementById('dealer').style.top = canvas.height / 4.8 * 3 / 11 + 'px';
                                 //tried to fix positioning but it won't work unless our table is circular :/
                                 create_game_btns();
-
+                                stack_size = prompt("Stack Size: ");
                                 that.socket.emit('login', nickname, stack_size, position)
                             })
                         })
