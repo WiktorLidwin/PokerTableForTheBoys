@@ -110,6 +110,8 @@ function create_player_profile(nickname, pos, chips) {
 }
 my_turn = false;
 pot = 0;
+MIN_RAISE = 0;
+BETS = [];
 
 function create_game_btns() {
     var body = document.getElementsByTagName("body")[0];
@@ -279,8 +281,9 @@ Game.prototype = {
             }
         });
 
-        this.socket.on("my_turn", function(pos, nicknames, raise) {
+        this.socket.on("my_turn", function(pos, nicknames, raise, min_raise) {
             if (pos === position) {
+                MIN_RAISE = min_raise;
                 console.log(raise);
                 var btn = document.getElementById("check-btn");
                 if (raise != 0)
@@ -301,6 +304,10 @@ Game.prototype = {
         });
 
         this.socket.on("update_bets", function(raise_arry, current_pos) {
+            console.log("test123")
+            console.log(raise_arry)
+            BETS = raise_arry;
+
             var elements = document.getElementsByClassName("betting_text");
             for (let i = 0; i < elements.length; i++) {
                 elements[i].parentNode.removeChild(elements[i]);
@@ -464,6 +471,7 @@ Game.prototype = {
                         else
                             create_player_profile(nicknames[i], (i - position + 8) % 8, chips[i])
                     }
+
                 }
 
             })
