@@ -14,20 +14,13 @@
 <body>
 <nav style="visibility: hidden;">
     <div class="nav-wrapper" style="visibility: visible;">
-        <a class="brand-logo" style="padding-left: 1%; padding-right: 5%"><span style="color: white;font-family: 'Montserrat', sans-serif;border: 1px black">Invite Your Friends!</span></a>
+        <a href="index.html" class="brand-logo" style="padding-left: 1%; padding-right: 5%"><span style="color: white;font-family: 'Montserrat', sans-serif;border: 1px black">Invite Your Friends!</span></a>
     </div>
 </nav>
 <div class="main-container" style="text-align: center; align-items: center;">
     <div class="center">
-        <a class="home" href="index.html"><h1 class="text-light"><span style="color: #FFFFFF; -webkit-text-stroke: 2px black">JFF Poker</span></h1></a>
+        <a href="#" class="home" href="index.html"><h1 class="text-light"><span style="color: #FFFFFF; -webkit-text-stroke: 2px black">JFF Poker</span></h1></a>
         <div class="button-group" id="btn_grp" role="group" align="center">
-            <div class="input-field col s6">
-                <input id="input_text" type="text" data-length="10" placeholder="Username" style="color:#66ddcd;text-align: center; width: 60%;">
-                <label for="input_text"></label>
-            </div>
-            <a class="room_button" id="login">Login</a>
-            <hr style="border: 1px dotted aqua" />
-            <a class="room_button" id="signup">Sign Up</a>
             <div class="row">
                 <div class="input-field col s6">
                     <input id="username" type="text" class="validate" style="color: chartreuse; text-align:center">
@@ -36,6 +29,19 @@
                 <div class="input-field col s6">
                     <input id="password" type="password" class="validate" style="color: chartreuse; text-align:center">
                     <span class="helper-text" style="color: white" data-error="wrong" data-success="right">Password</span>
+                </div>
+            </div>
+            <a class="room_button" id="login">Login</a>
+            <hr style="border: 1px solid white" />
+            <a class="room_button" id="signup">Sign Up</a>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="new_username" type="text" class="validate" style="color: chartreuse; text-align:center">
+                    <span class="helper-text" style="color: white" data-error="wrong" data-success="right">New Username</span>
+                </div>
+                <div class="input-field col s6">
+                    <input id="new_password" type="password" class="validate" style="color: chartreuse; text-align:center">
+                    <span class="helper-text" style="color: white" data-error="wrong" data-success="right">New Password</span>
                 </div>
             </div>
         </div>
