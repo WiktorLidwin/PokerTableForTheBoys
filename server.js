@@ -230,17 +230,24 @@ io.sockets.on('connection', function(socket) {
             if (rooms[roomIndex].players[i].socketid == socket.id) {
                 console.log(rooms[roomIndex].players[i].chips, rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position])
                     //rooms[roomIndex].players[i].chips = rooms[roomIndex].players[i].chips - (max_money - rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position]);
-                rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] = rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] - (max_money - rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position]);
+
                 console.log((max_money - rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position]))
                 x = (max_money - rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position]);
+
+                if (rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] <= x) {
+                    x = rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position]
+                    rooms[roomIndex].all_in_array[rooms[roomIndex].players[i].position] = true;
+                    console.log("someone all in!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                }
+                rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] -= x;
                 rooms[roomIndex].ammount_in_pot[rooms[roomIndex].players[i].position] += x;
                 rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position] += x;
                 rooms[roomIndex].pot += x;
+
                 console.log("mas")
                 console.log(x)
                 console.log(rooms[roomIndex].players[i].chips, rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position])
-
-                //rooms[roomIndex].players[i].chipsInPot = rooms[roomIndex].raised_by;
+                    //rooms[roomIndex].players[i].chipsInPot = rooms[roomIndex].raised_by;
             }
         }
         console.log(rooms[roomIndex].raise_array)
@@ -280,6 +287,9 @@ io.sockets.on('connection', function(socket) {
                 rooms[roomIndex].ammount_in_pot[rooms[roomIndex].players[i].position] += x;
                 rooms[roomIndex].raise_array[rooms[roomIndex].players[i].position] += x;
                 rooms[roomIndex].pot += x;
+                if (rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] == 0) {
+                    rooms[roomIndex].all_in_array[rooms[roomIndex].players[i].position] = true;
+                }
                 console.log(12121212121)
                 console.log(x)
                     //rooms[roomIndex].players[i].chipsInPot += amount + rooms[roomIndex].raised_by;
@@ -456,6 +466,21 @@ function round(roomIndex) {
     }
     rooms[roomIndex].stillPlaying.sort();
     rooms[roomIndex].folded.sort();
+    temp2 = 0;
+    all_in = false;
+    console.log("((((((((((((((((((((((((((((")
+    console.log(rooms[roomIndex].stillPlaying)
+    console.log(rooms[roomIndex].all_in_array)
+
+    for (let z = 0; z < rooms[roomIndex].stillPlaying.length; z++) {
+        if (rooms[roomIndex].all_in_array[rooms[roomIndex].stillPlaying[z]] == true) {
+            temp2++;
+        }
+    }
+    if (temp2 + 1 == rooms[roomIndex].stillPlaying.length) {
+        all_in = true;
+        console.log("ALL IN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    }
 
     console.log("curr,big")
     console.log(rooms[roomIndex].current_pos, rooms[roomIndex].big_blind)
@@ -464,7 +489,7 @@ function round(roomIndex) {
         console.log("special")
             //special case where everyone checks prefold
         for (let z = 0; z < rooms[roomIndex].players.length; z++) {
-            if (rooms[roomIndex].current_pos === rooms[roomIndex].players[z].position) {
+            if (rooms[roomIndex].current_pos === rooms[roomIndex].players[z].position && rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] != 0) {
                 console.log("in1")
                 console.log(rooms[roomIndex].raise_array)
                 io.in(rooms[roomIndex].id).emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
@@ -483,7 +508,11 @@ function round(roomIndex) {
                 }
                 console.log(max, Math.max(rooms[roomIndex].raise_array), rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
                 io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) < max ? (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) : max, (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
-
+            } else if (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] == 0) {
+                //check code
+                temp = get_players_pos(roomIndex);
+                rooms[roomIndex].current_pos = temp[(temp.indexOf(rooms[roomIndex].current_pos) + 1) % temp.length];
+                round(roomIndex);
             }
         }
     } else
@@ -509,6 +538,8 @@ function round(roomIndex) {
         rooms[roomIndex].currect_deck = [];
         rooms[roomIndex].ammount_in_pot = [0, 0, 0, 0, 0, 0, 0, 0];
         rooms[roomIndex].raise_array = [null, null, null, null, null, null, null, null];
+        rooms[roomIndex].all_in_array = [null, null, null, null, null, null, null, null];
+
         for (let i = 0; i < rooms[roomIndex].players.length; i++) {
             rooms[roomIndex].players[i].folded = false;
         }
@@ -521,7 +552,7 @@ function round(roomIndex) {
         make_preflop(roomIndex);
         rooms[roomIndex].boardState = 0;
         round(roomIndex);
-    } else if (check_for_next_round(roomIndex)) {
+    } else if (check_for_next_round(roomIndex) || all_in) {
         console.log("finished round")
             //finished round
         for (let z = 0; z < rooms[roomIndex].players.length; z++) {
@@ -541,13 +572,21 @@ function round(roomIndex) {
         rooms[roomIndex].current_pos = num;
 
         if (rooms[roomIndex].boardState == 0) {
-            make_flop(roomIndex);
+
+            sleep(1000).then(() => {
+                make_flop(roomIndex);
+            })
         }
         if (rooms[roomIndex].boardState == 1) {
-            make_turn(roomIndex);
+
+            sleep(1000).then(() => {
+                make_turn(roomIndex);
+            })
         }
         if (rooms[roomIndex].boardState == 2) {
-            make_river(roomIndex);
+            sleep(1000).then(() => {
+                make_river(roomIndex);
+            })
         }
         if (rooms[roomIndex].boardState == 3) {
             temp = get_players_pos(roomIndex);
@@ -578,6 +617,10 @@ function round(roomIndex) {
             rooms[roomIndex].all_in_array = [null, null, null, null, null, null, null, null];
             for (let i = 0; i < rooms[roomIndex].players.length; i++) {
                 rooms[roomIndex].players[i].folded = false;
+            }
+            for (let i = 0; i < rooms[roomIndex].players.length; i++) {
+                if (rooms[roomIndex].players_chips[rooms[roomIndex].players[i].position] == 0)
+                    rooms[roomIndex].players.splice(i, 1);
             }
             sleep(5000).then(() => {
                 make_preflop(roomIndex);

@@ -33,8 +33,8 @@ img.cards {
     z-index: 6;
 }
 
-/* Add a background color on hover */
 
+/* Add a background color on hover */
 
 .sit-down-btn {
     background-color: #3498db;
@@ -50,12 +50,13 @@ img.cards {
 }
 
 .user_profile_box {
-    color: rgba(255, 255, 255, 0);
+    color: black;
     border-radius: 25px;
     border: 2px solid rgb(255, 0, 0);
     padding: 20px;
     text-align: center;
     font-size: 30px;
+    visibility: visible;
 }
 
 .start-game-btn {
