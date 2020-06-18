@@ -28,7 +28,7 @@ join_btn.addEventListener('click', function() {
 create_btn.addEventListener('click', function() {
     if (clicked === 0) {
         clicked = 1;
-        socket.emit('create_room', small_btn.value != "" ? small_btn.value : small_btn.placeholder, big_btn.value != "" ? big_btn.value : big_btn.placeholder);
+        socket.emit('create_room', small_btn.value != "" ? parseInt(small_btn.value) : parseInt(small_btn.placeholder), big_btn.value != "" ? parseInt(big_btn.value) : parseInt(big_btn.placeholder));
         console.log('request to create room')
             //join_btn.setAttribute('id', 'join_btn_altered')
 

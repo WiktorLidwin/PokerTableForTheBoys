@@ -616,6 +616,7 @@ function round(roomIndex) {
                     }
                 }
                 console.log(max, Math.max(rooms[roomIndex].raise_array), rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position])
+                console.log(rooms[roomIndex].players_chips)
                 console.log("here: " + (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]));
                 io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) < max ? (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) : max, (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
 
