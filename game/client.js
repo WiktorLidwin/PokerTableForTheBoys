@@ -61,11 +61,11 @@ function make_bets(raise_arry, current_pos) {
                 btn.innerHTML = "Check";
             console.log("*&&&(*&(*");
             console.log(((i - position + 8) % 8) * 2);
-            if (position !== -1) {
-                btn.style.left = betting_positions[((i - position + 8) % 8) * 2] - 50 + 'px';
-                btn.style.top = canvas.height / 4 * 3 - 200 + 'px';
+            if (position === i) {
+                btn.style.left = canvas.width/2 + 'px';
+                btn.style.top = canvas.height / 4 * 3 - 60 + 'px';
             } else {
-                btn.style.left = betting_positions[i * 2] + 'px';
+                btn.style.left = betting_positions[((i - position + 8) % 8) * 2]  + 'px';
                 btn.style.top = canvas.height / 4 * 3 - 200 + 'px';
             }
             var body = document.getElementsByTagName("body")[0];
@@ -92,16 +92,16 @@ function delete_sit_down_btns() {
 
 function create_player_profile(nickname, pos, chips) {
     console.log("creating profile..." + pos)
-    var other_user_profile = document.createElement("textBox")
-    other_user_profile.className = "other_user_profile"
+    var other_user_profile = document.createElement("textBox");
+    other_user_profile.className = "other_user_profile";
     other_user_profile.style.position = "absolute";
     other_user_profile.style.textAlign = "center";
     if (pos === 0) {
-        other_user_profile.style.left = canvas.width / 2 - (document.getElementById("user_profile_box").offsetWidth) + 'px';
+        other_user_profile.style.left = canvas.width / 2 - (document.getElementById("user_profile_box").offsetWidth)/2 - 50 + 'px';
         other_user_profile.style.top = canvas.height / 4 * 3 - 150 + 'px';
     } else {
         other_user_profile.style.left = card_positions[(pos - 1) * 2] + 'px';
-        other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 125 + 'px';
+        other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 70 + 'px';
     }
     console.log(card_positions[(pos - 1) * 2], card_positions[(pos - 1) * 2 + 1]);
     other_user_profile.innerHTML = nickname + ": " + chips;
@@ -215,7 +215,7 @@ Game.prototype = {
         })
         this.socket.on("pot_update", function(new_pot) {
             pot = new_pot;
-            btn = document.getElementById("pot_box")
+            btn = document.getElementById("pot_box");
             btn.innerHTML = "Pot: " + new_pot;
         })
         this.socket.on("winner", function(winners, players_hands) {
@@ -362,20 +362,24 @@ Game.prototype = {
                     if (positions[i] === 0) {
                         var btn = document.createElement("button");
                         btn.className = "sit-down-btn";
+                        btn.setAttribute('id', 'sit-down-btn');
                         btn.innerHTML = "Sit Down";
                         btn.style.position = "absolute";
-                        if (i > 2 && i < 6) {
-                            console.log(card_positions[(i - 1) * 2 + 1] + cardy_size);
-                            btn.style.left = (card_positions[(i - 1) * 2]) + 'px';
-                            btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
-                        } else {
-                            btn.style.left = card_positions[(i - 1) * 2] + 'px';
-                            btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
-                        }
+                        btn.style.width = "10%";
                         var body = document.getElementsByTagName("body")[0];
                         body.appendChild(btn);
+
+                        if (i > 2 && i < 6) {
+                            console.log(card_positions[(i - 1) * 2 + 1] + cardy_size);
+                            btn.style.left = (card_positions[(i - 1) * 2]) - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
+                            btn.style.top = (card_positions[(i - 1) * 2 + 1] + cardy_size) + 'px';
+                        } else {
+                            btn.style.left = card_positions[(i - 1) * 2]  - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
+                            btn.style.top = card_positions[(i - 1) * 2 + 1] + 'px';
+                        }
+
                         btn.addEventListener("pointerover", function() {
-                            console.log("clicked on btn:" + i)
+                            console.log("clicked on btn:" + i);
                             if (current_sit_down_btn_clicked !== null) {
                                 current_sit_down_btn_clicked.parentNode.removeChild(current_sit_down_btn_clicked);
                                 current_request_btn_clicked.parentNode.removeChild(current_request_btn_clicked);
@@ -385,30 +389,37 @@ Game.prototype = {
                             x.setAttribute("type", "text");
                             x.setAttribute("placeHolder", "NickName: ");
                             x.className = "name-text-box";
+                            x.setAttribute('id', 'name-text-box');
                             x.style.position = 'absolute';
+                            x.style.padding = "0 auto";
+                            var body = document.getElementsByTagName("body")[0];
+                            body.appendChild(x);
                             if (i > 2 && i < 6) {
-                                x.style.left = (card_positions[(i - 1) * 2] - 10) + 'px';
-                                x.style.top = (card_positions[(i - 1) * 2 + 1] + 48 + cardy_size) + 'px';
+                                x.style.left = (card_positions[(i - 1) * 2]) - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
+                                x.style.top = (card_positions[(i - 1) * 2 + 1] + 48 + cardy_size)  + 'px';
                             } else {
-                                x.style.left = card_positions[(i - 1) * 2] - 10 + 'px';
+                                x.style.left = card_positions[(i - 1) * 2]  - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
                                 x.style.top = card_positions[(i - 1) * 2 + 1] + 48 + 'px';
 
                             }
-                            var body = document.getElementsByTagName("body")[0];
-                            body.appendChild(x);
+
                             var btn = document.createElement("button");
                             btn.className = "request-btn";
+                            btn.setAttribute('id', 'request-btn');
                             btn.innerHTML = "Request Spot";
+                            btn.style.width = "10%";
                             btn.style.position = "absolute";
-                            if (i > 2 && i < 6) {
-                                btn.style.left = (card_positions[(i - 1) * 2] - 10) + 'px';
-                                btn.style.top = (card_positions[(i - 1) * 2 + 1] + 70 + cardy_size) + 'px';
-                            } else {
-                                btn.style.left = card_positions[(i - 1) * 2] - 10 + 'px';
-                                btn.style.top = card_positions[(i - 1) * 2 + 1] + 70 + 'px';
-                            }
+                            btn.style.padding = "0";
                             var body = document.getElementsByTagName("body")[0];
                             body.appendChild(btn);
+                            if (i > 2 && i < 6) {
+                                btn.style.left = (card_positions[(i - 1) * 2]) - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
+                                btn.style.top = (card_positions[(i - 1) * 2 + 1] + 70 + cardy_size) + 'px';
+                            } else {
+                                btn.style.left = card_positions[(i - 1) * 2]  - document.getElementById("sit-down-btn").offsetWidth/2 + 'px';
+                                btn.style.top = card_positions[(i - 1) * 2 + 1] + 70 + 'px';
+                            }
+
                             current_request_btn_clicked = btn;
                             btn.addEventListener("click", function() {
                                 nickname = x.value;
@@ -420,12 +431,13 @@ Game.prototype = {
                                 user_profile_box.id = "user_profile_box";
                                 user_profile_box.className = "user_profile_box";
                                 user_profile_box.style.position = "absolute";
-                                user_profile_box.style.left = canvas.width / 2 + 'px';
+                                var body = document.getElementsByTagName("body")[0];
+                                body.appendChild(user_profile_box);
+                                user_profile_box.style.left = canvas.width / 2 - 100 + document.getElementById("user_profile_box").offsetWidth/2 + 'px';
                                 user_profile_box.style.top = canvas.height / 4 * 3 - 150 + 'px';
                                 user_profile_box.style.textAlign = "center";
 
-                                var body = document.getElementsByTagName("body")[0];
-                                body.appendChild(user_profile_box);
+
                                 if (i > 2 && i < 6)
                                     document.getElementById('dealer').style.top = canvas.height / 4.8 * 3 / 11 + 'px';
                                 //tried to fix positioning but it won't work unless our table is circular :/
@@ -442,11 +454,11 @@ Game.prototype = {
                         dealer.setAttribute("alt", "dealer");
                         dealer.setAttribute('id', 'dealer');
                         dealer.style.position = "absolute";
-                        dealer.style.left = canvas.width / 2.2 + 'px';
-                        dealer.style.top = canvas.height / 4.8 * 3 + 'px';
-                        dealer.style.visibility = 'visible';
                         var body = document.getElementsByTagName("body")[0];
                         body.appendChild(dealer);
+                        dealer.style.left = canvas.width / 2 - document.getElementById("dealer").offsetWidth/2 + 'px';
+                        dealer.style.top = canvas.height / 4.8 * 3 + 'px';
+                        dealer.style.visibility = 'visible';
 
                     }
                 }
