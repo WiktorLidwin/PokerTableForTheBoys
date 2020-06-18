@@ -97,11 +97,11 @@ function create_player_profile(nickname, pos, chips) {
     other_user_profile.style.position = "absolute";
     other_user_profile.style.textAlign = "center";
     if (pos === 0) {
-        other_user_profile.style.left = canvas.width / 2 + 'px';
+        other_user_profile.style.left = canvas.width / 2 - (document.getElementById("user_profile_box").offsetWidth) + 'px';
         other_user_profile.style.top = canvas.height / 4 * 3 - 150 + 'px';
     } else {
         other_user_profile.style.left = card_positions[(pos - 1) * 2] + 'px';
-        other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 100 + 'px';
+        other_user_profile.style.top = card_positions[(pos - 1) * 2 + 1] - 125 + 'px';
     }
     console.log(card_positions[(pos - 1) * 2], card_positions[(pos - 1) * 2 + 1]);
     other_user_profile.innerHTML = nickname + ": " + chips;
@@ -142,7 +142,8 @@ function create_game_btns() {
             // amt.style.top = '50%';
             // amt.style.left = '50%';
             // body.appendChild(amt);
-            amount = 50; //change this later
+            amount = prompt("Raise amount: ");
+
             that.socket.emit("raise", amount);
             my_turn = false;
             var btn = document.getElementById("my_turn");

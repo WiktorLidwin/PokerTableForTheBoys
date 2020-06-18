@@ -16,11 +16,10 @@ body {
 }
 
 .group-buttons {
-    background-color: #4CAF50;
-    /* Green background */
-    border: 1px solid green;
+    background-color: #12cbc7;
+    border: 2px solid rgb(0, 1, 0);
     /* Green border */
-    color: white;
+    color: black;
     /* White text */
     padding: 10px 24px;
     /* Some padding */
@@ -36,9 +35,6 @@ img.cards {
 
 /* Add a background color on hover */
 
-.group-buttons :hover {
-    background-color: #3e8e41;
-}
 
 .sit-down-btn {
     background-color: #3498db;
@@ -54,6 +50,7 @@ img.cards {
 }
 
 .user_profile_box {
+    color: white;
     border-radius: 25px;
     border: 2px solid rgb(255, 0, 0);
     padding: 20px;
@@ -63,7 +60,8 @@ img.cards {
 
 .start-game-btn {
     border-radius: 25px;
-    border: 2px solid rgb(0, 255, 0);
+    background-color: #12cbc7;
+    border: 2px solid rgb(0, 1, 0);
     padding: 20px;
     width: 200px;
     height: 100px;
@@ -72,6 +70,8 @@ img.cards {
 }
 
 .other_user_profile {
+    color: white;
+    text-outline: black 1px;
     border-radius: 25px;
     border: 2px solid rgb(0, 0, 0);
     padding: 20px;
