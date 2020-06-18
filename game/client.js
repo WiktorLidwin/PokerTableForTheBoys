@@ -111,6 +111,7 @@ function create_player_profile(nickname, pos, chips) {
 my_turn = false;
 pot = 0;
 MIN_RAISE = 0;
+MAX_RAISE = 0;
 BETS = [];
 
 function create_game_btns() {
@@ -142,12 +143,20 @@ function create_game_btns() {
             // amt.style.top = '50%';
             // amt.style.left = '50%';
             // body.appendChild(amt);
-            amount = prompt("Raise amount: ");
-
-            that.socket.emit("raise", amount);
-            my_turn = false;
-            var btn = document.getElementById("my_turn");
-            btn.innerHTML = "";
+            amount = parseInt(prompt("Raise amount(Min Raise:" + MIN_RAISE + ", Max Raise: " + MAX_RAISE + "): "), 10);
+            console.log(amount);
+            if (isNaN(amount) || amount == 0 || amount == null) {
+                console.log("???");
+            } else if (amount < MIN_RAISE || amount > MAX_RAISE) {
+                console.log("????");
+                amount = parseInt(prompt("Raise amount(Min Raise:" + MIN_RAISE + ", Max Raise: " + MAX_RAISE + "): "), 10);
+            } else {
+                console.log("?????");
+                that.socket.emit("raise", amount);
+                my_turn = false;
+                var btn = document.getElementById("my_turn");
+                btn.innerHTML = "";
+            }
         }
     });
 
@@ -284,9 +293,11 @@ Game.prototype = {
             }
         });
 
-        this.socket.on("my_turn", function(pos, nicknames, raise, min_raise) {
+        this.socket.on("my_turn", function(pos, nicknames, raise, min_raise, max_raise) {
             if (pos === position) {
                 MIN_RAISE = min_raise;
+                MAX_RAISE = max_raise;
+
                 console.log(raise);
                 var btn = document.getElementById("check-btn");
                 if (raise != 0)
@@ -456,8 +467,10 @@ Game.prototype = {
         this.socket.on('player_profile', function(chips, cards) {
             console.log("Profile update");
             var user_profile_box = document.getElementById("user_profile_box");
-            user_profile_box.innerHTML = nickname + ": " + chips + "<br>" + cards;
-
+            if (cards != undefined)
+                user_profile_box.innerHTML = nickname + ": " + chips + "<br>" + cards;
+            else
+                user_profile_box.innerHTML = nickname + ": " + chips;
         });
         this.socket.on('update_other_profiles', function(nicknames, positions, chips) {
                 console.log("update_other_profiles")

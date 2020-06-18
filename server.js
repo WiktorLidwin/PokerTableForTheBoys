@@ -16,6 +16,7 @@ var Room = function() {
 
 function create_room(roomid) {
     var x = new Room();
+    x.all_in_array = [null, null, null, null, null, null, null, null];
     x.big_blind_pos = 0;
     x.small_blind_pos = 0;
     x.id = roomid;
@@ -47,6 +48,7 @@ function create_room(roomid) {
 }
 
 Room.prototype = {
+    all_in_array: [],
     raise_array: [],
     ammount_in_pot: [],
     big_blind_pos: 0,
@@ -301,6 +303,7 @@ io.sockets.on('connection', function(socket) {
                 0, 0, 0, 0, 0, 0, 0, 0
             ]; //reset on hands
             rooms[roomIndex].raise_array = [null, null, null, null, null, null, null, null]; //reset on next cards
+            rooms[roomIndex].all_in_array = [null, null, null, null, null, null, null, null];
             rooms[roomIndex].ammount_in_pot = [0, 0, 0, 0, 0, 0, 0, 0];
             temp = get_players_pos(roomIndex)
             rooms[roomIndex].small_blind_pos = temp[0];
@@ -457,10 +460,33 @@ function round(roomIndex) {
     console.log("curr,big")
     console.log(rooms[roomIndex].current_pos, rooms[roomIndex].big_blind)
     console.log(rooms[roomIndex].raise_array[rooms[roomIndex].current_pos], rooms[roomIndex].ammount_in_pot[rooms[roomIndex].current_pos])
-        // if (rooms[roomIndex].current_pos == rooms[roomIndex].big_blind_pos && rooms[roomIndex].raise_array[rooms[roomIndex].current_pos] == rooms[roomIndex].ammount_in_pot[rooms[roomIndex].current_pos]) {
-        //     console.log("special")
-        //         //special case where everyone checks prefold
-        // } else
+    if (rooms[roomIndex].current_pos == rooms[roomIndex].big_blind_pos && rooms[roomIndex].raise_array[rooms[roomIndex].current_pos] == rooms[roomIndex].ammount_in_pot[rooms[roomIndex].current_pos] && rooms[roomIndex].raise_array[rooms[roomIndex].current_pos] == rooms[roomIndex].big_blind) {
+        console.log("special")
+            //special case where everyone checks prefold
+        for (let z = 0; z < rooms[roomIndex].players.length; z++) {
+            if (rooms[roomIndex].current_pos === rooms[roomIndex].players[z].position) {
+                console.log("in1")
+                console.log(rooms[roomIndex].raise_array)
+                io.in(rooms[roomIndex].id).emit('update_other_profiles', rooms[roomIndex].nicknames, rooms[roomIndex].positions, rooms[roomIndex].players_chips);
+                io.in(rooms[roomIndex].id).emit('update_bets', rooms[roomIndex].raise_array, rooms[roomIndex].current_pos);
+                //socket.emit("player_profile", )
+                io.to(rooms[roomIndex].players[z].socketid).emit('player_profile', rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position], rooms[roomIndex].players[z].winning_hand)
+                rooms[roomIndex].time = new Date();
+                rooms[roomIndex].past_time = rooms[roomIndex].time.getTime();
+                rooms[roomIndex].made_move = false;
+                //io.to(players[z].socketid).emit("my_turn")
+                max = rooms[roomIndex].big_blind;
+                for (let i = 0; i < rooms[roomIndex].raise_array.length; i++) {
+                    if (rooms[roomIndex].raise_array[i] > max) {
+                        max = rooms[roomIndex].raise_array[i]
+                    }
+                }
+                console.log(max, Math.max(rooms[roomIndex].raise_array), rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
+                io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) < max ? (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) : max, (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
+
+            }
+        }
+    } else
     if (rooms[roomIndex].stillPlaying.length === 1) {
         //everyone else folded
         console.log("everyone folded")
@@ -549,6 +575,7 @@ function round(roomIndex) {
             rooms[roomIndex].river = null;
             rooms[roomIndex].currect_deck = [];
             rooms[roomIndex].ammount_in_pot = [0, 0, 0, 0, 0, 0, 0, 0];
+            rooms[roomIndex].all_in_array = [null, null, null, null, null, null, null, null];
             for (let i = 0; i < rooms[roomIndex].players.length; i++) {
                 rooms[roomIndex].players[i].folded = false;
             }
@@ -589,7 +616,9 @@ function round(roomIndex) {
                     }
                 }
                 console.log(max, Math.max(rooms[roomIndex].raise_array), rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position])
-                io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], max)
+                console.log("here: " + (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]));
+                io.in(rooms[roomIndex].id).emit("my_turn", rooms[roomIndex].players[z].position, rooms[roomIndex].nicknames, max - rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position], (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) < max ? (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]) : max, (rooms[roomIndex].players_chips[rooms[roomIndex].players[z].position] - max + rooms[roomIndex].raise_array[rooms[roomIndex].players[z].position]))
+
             }
         }
     }
