@@ -1,5 +1,5 @@
 canvas {
-    background-image: url('Artboard\ 1.png');
+    background-image: url('Artboard 1.png');
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     background-size: 100% 100%;
     margin: 0 auto;
@@ -50,7 +50,7 @@ img.cards {
 }
 
 .user_profile_box {
-    color: white;
+    color: rgba(255, 255, 255, 0);
     border-radius: 25px;
     border: 2px solid rgb(255, 0, 0);
     padding: 20px;
@@ -70,7 +70,7 @@ img.cards {
 }
 
 .other_user_profile {
-    color: white;
+    color: #ffffff;
     text-outline: black 1px;
     border-radius: 25px;
     border: 2px solid rgb(0, 0, 0);
@@ -103,7 +103,7 @@ img.cards {
     border-radius: 25px;
     border: 2px solid rgb(0, 0, 0);
     padding: 20px;
-    width: 300px;
+    width: 20%;
     height: 75px;
     text-align: center;
     font-size: 50px;
@@ -116,7 +116,7 @@ img.cards {
 .name-text-box {
     padding: 0;
     height: 30px;
-    width: 151px;
+    width: 10%;
     position: relative;
     left: 0;
     outline: none;
